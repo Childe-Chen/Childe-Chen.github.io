@@ -1,37 +1,512 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-{% block page_class %}page-post-detail{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="目的Bridge是结构模式的一种，它可以帮你分离一个巨大的类或者将一组关系相近的类分离成为两个独立的层次结构，抽象和实现，可以各自独立开发。 问题抽象？实现？听起来害怕？我们首先来看个简单的例子。 你有一个几何Shap类，他有一对子类：Square和Triangle。你希望扩展这个层次结构来融入颜色以便创建红色和蓝色的形状。但是因为你已经有子类，你需要创建4个类来组合，比如BlueSquare和R">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译-设计模式-结构模式之Bridge">
+<meta property="og:url" content="http://yoursite.com/2017/10/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BBridge/index.html">
+<meta property="og:site_name" content="凡隐的博客">
+<meta property="og:description" content="目的Bridge是结构模式的一种，它可以帮你分离一个巨大的类或者将一组关系相近的类分离成为两个独立的层次结构，抽象和实现，可以各自独立开发。 问题抽象？实现？听起来害怕？我们首先来看个简单的例子。 你有一个几何Shap类，他有一对子类：Square和Triangle。你希望扩展这个层次结构来融入颜色以便创建红色和蓝色的形状。但是因为你已经有子类，你需要创建4个类来组合，比如BlueSquare和R">
+<meta property="og:locale">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535288248/blog/pattern/structural/bridge/shapeCombination.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535288249/blog/pattern/structural/bridge/shapeSolution.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535288247/blog/pattern/structural/bridge/compare.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535288248/blog/pattern/structural/bridge/exampleApp.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535288250/blog/pattern/structural/bridge/structure.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535288249/blog/pattern/structural/bridge/umlExample.jpg">
+<meta property="article:published_time" content="2017-10-17T10:50:00.000Z">
+<meta property="article:modified_time" content="2021-10-30T17:01:17.452Z">
+<meta property="article:author" content="childe.chen">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="Design Patterns">
+<meta property="article:tag" content="Bridge">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://res.cloudinary.com/childe/image/upload/v1535288248/blog/pattern/structural/bridge/shapeCombination.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2017/10/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BBridge/">
 
 
-{% block content %}
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+  <title>译-设计模式-结构模式之Bridge | 凡隐的博客</title>
+  
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">凡隐的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">平凡的世界</p>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BBridge/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="childe.chen">
+      <meta itemprop="description" content="少爷凡隐">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凡隐的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译-设计模式-结构模式之Bridge
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-10-17 18:50:00" itemprop="dateCreated datePublished" datetime="2017-10-17T18:50:00+08:00">2017-10-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-10-31 01:01:17" itemprop="dateModified" datetime="2021-10-31T01:01:17+08:00">2021-10-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h3><p>Bridge是结构模式的一种，它可以帮你分离一个巨大的类或者将一组关系相近的类分离成为两个独立的层次结构，抽象和实现，可以各自独立开发。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>抽象？实现？听起来害怕？我们首先来看个简单的例子。</p>
+<p>你有一个几何Shap类，他有一对子类：Square和Triangle。你希望扩展这个层次结构来融入颜色以便创建红色和蓝色的形状。但是因为你已经有子类，你需要创建4个类来组合，比如BlueSquare和RedTriangle。<br><span id="more"></span><br><img src="https://res.cloudinary.com/childe/image/upload/v1535288248/blog/pattern/structural/bridge/shapeCombination.jpg" alt="shapeCombination"></p>
+<p>添加更多的形状类型和颜色将会导致层级结构变的更大。比如，添加一个Circles，你必须创建两个子类，每个对应一种颜色。之后，再添加新的颜色就需要为每个形状添加一个子类。再往后发展，将会变的更糟。</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>我们每次在扩展类层次到几个独立纬度时都会碰到这个问题。</p>
+<p>Bridge模式尝试通过用委托替换继承来解决这个问题。你必须将其中一个维度抽离到不同的层次结构中。原类将通过持有新层次结构中的一个对象的引用的方式来替换在一个类中保留它所有的状态和行为的方式。</p>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535288249/blog/pattern/structural/bridge/shapeSolution.jpg" alt="shapeSolution"></p>
+<p>通过这种方式我们抽离出Color和它的两个子类，Red和Blue。Shape类将持有一个颜色类的引用域。当我们需要时通过这个引用把工作委托给color对象。这个引用在Shapps和Color之间像桥一样提供服务。从现在开始，添加color将不再需要改变shape类，反之亦然。</p>
+<h3 id="抽象（Abstraction）和实现（Implementation）"><a href="#抽象（Abstraction）和实现（Implementation）" class="headerlink" title="抽象（Abstraction）和实现（Implementation）"></a>抽象（Abstraction）和实现（Implementation）</h3><p>在GoF的书中把“抽象和实现”一词作为Bridge模式定义的一部分。在我看来，那样太过学术并且使得这个模式变的更加难以理解。通过上面那个简单的例子，让我们看下GoF的真正意思。</p>
+<p>抽象（Abstraction），也叫做接口（Interface），是一些实体的控制层。它们自己并不做任何真正事情，而是把大多工作委托给实现（Implementation）层，有时叫做平台（Platform）。不要把接口和抽象类和你的编程语言混淆，他们不是一回事。</p>
+<p>比如，当我们谈到真正的应用是，抽象可以表示用户图形界面（GUI），实现可以表示响应用户交互的GUI层调用系统底层操作的API。</p>
+<p>有两个方向来将应用扩展：</p>
+<ul>
+<li>有一些不同的GUI（用户GUI和管理GUI）</li>
+<li>支持一些不同的API（可以工作在Windows，Linux和MacOS下）</li>
+</ul>
+<p>这个程序的代码看起来像<a target="_blank" rel="noopener" href="http://wiki.mbalib.com/wiki/%E2%80%9C%E6%84%8F%E5%A4%A7%E5%88%A9%E9%9D%A2%E6%9D%A1%E7%A2%97%E2%80%9D%E7%8E%B0%E8%B1%A1">“巨大的意大利面条碗”</a>，有着成吨的连接不同GUI和API行为的操作条件。</p>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535288247/blog/pattern/structural/bridge/compare.jpg" alt="compare"></p>
+<p>可以通过对所有接口-平台的变体进行子类化来改进代码。但实际上，这个将导致我们已经在形状例子中看到的同样的问题。类层次将爆发时增长，每个新GUI或者API类型将需要增加一些组合类。</p>
+<p>Bridge模式建议把这些类分成两个层次：</p>
+<ul>
+<li>抽象层（Abstraction）：应用的GUI层。</li>
+<li>实现层（Implementation）：操作系统API。</li>
+</ul>
+<p>抽象对象持有一个具体实现对象的引用。只要遵循通用的接口，使同一个GUI能够在Windows和Linux下工作，不同的实现将是可互换的。</p>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535288248/blog/pattern/structural/bridge/exampleApp.jpg" alt="exampleApp"></p>
+<p>更重要的是，你可以在不触碰操作系统代码的情况下开始在GUI类中工作，反之亦然。比如，添加一个对新操作系统的支持，将仅需要在实现层中创建一个子类。</p>
+<h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p><img src="https://res.cloudinary.com/childe/image/upload/v1535288250/blog/pattern/structural/bridge/structure.jpg" alt="structure"></p>
+<ol>
+<li><p>抽象（Abstraction）主要包含一个像用户接口一样的控制逻辑。抽象代码依赖具体实现对象来完成任务。</p>
+</li>
+<li><p>实现（Implementation）为所有具体的实现声明了通用的接口。抽象层可以和任何一个符合这个接口的具体实现工作。<br> 抽象和实现接口在一些程序中是相等的。但是大多情况下，实现包含基本的原语操作，抽象层用它们来处理一些复杂的行为。</p>
+</li>
+<li><p>具体实现包含具体平台的代码。</p>
+</li>
+<li><p>精制抽象（Refined Abstractions）可以用来创建一些控制逻辑的变种。这些类和它们的父类一样，应该用实现接口（Implementation inteface）来和不同的实现协作。</p>
+</li>
+<li><p>客户端（Client）只和抽象类有一个地方不同。在构建抽象对象时，客户端会传递一个具体实现对象。然而，如果需要，具体实现可以动态替换。</p>
+</li>
+</ol>
+<h3 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h3><p>在这个例子中，Bridge将设备（Devices）和遥控器（Remotes）的代码分成几部分：</p>
+<ul>
+<li>设备（看作实现）</li>
+<li>遥控器（看作抽象）</li>
+</ul>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535288249/blog/pattern/structural/bridge/umlExample.jpg" alt="umlExample"></p>
+<p>遥控器的基类有一个域来持有一个要控制设备的对象引用。遥控器通过设备提供的通用接口工作。它允许一个遥控器可以和几个不同的设备协作（译者注：控制几个不同类型的设备）。</p>
+<p>你可以独立的改变控制类。例如，你可以创建一个仅有两个按钮的遥控器或者带有触摸屏的复杂遥控器。</p>
+<p>因此，Bridge模式允许你将一个实体分成几个不同的实体，它们可以独立发展。客户端代码总是保持简单。它只需要选择一个抽象并且配置给它一个具体实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// All remote classes contain reference to the device they controls. Remote&#x27;s</span></span><br><span class="line"><span class="comment">// methods delegate most of the work to the device methods.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Remote</span> is</span><br><span class="line">    <span class="keyword">protected</span> field device: Device</span><br><span class="line">    constructor <span class="title function_">BasicRemote</span><span class="params">(device: Device)</span> is</span><br><span class="line">        <span class="built_in">this</span>.device = device</span><br><span class="line">    method <span class="title function_">togglePower</span><span class="params">()</span> is</span><br><span class="line">        <span class="keyword">if</span> device.isEnabled() then device.disable()</span><br><span class="line">        <span class="keyword">else</span> device.enable()</span><br><span class="line">    method <span class="title function_">volumeDown</span><span class="params">()</span> is</span><br><span class="line">        device.setVolume(device.getVolume() - <span class="number">10</span>)</span><br><span class="line">    method <span class="title function_">volumeUp</span><span class="params">()</span> is</span><br><span class="line">        device.setVolume(device.getVolume() + <span class="number">10</span>)</span><br><span class="line">    method <span class="title function_">channelDown</span><span class="params">()</span> is</span><br><span class="line">        device.setChannel(device.getChannel() - <span class="number">1</span>)</span><br><span class="line">    method <span class="title function_">channelUp</span><span class="params">()</span> is</span><br><span class="line">        device.setChannel(device.getChannel() + <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// You can extend remote hierarchy independently from device classes.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AdvancedRemote</span> <span class="keyword">extends</span> <span class="title class_">BasicRemote</span> is</span><br><span class="line">    method <span class="title function_">mute</span><span class="params">()</span> is</span><br><span class="line">        device.setVolume(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// All devices have the common interface. This makes them compatible with</span></span><br><span class="line"><span class="comment">// all remotes.</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">Device</span> is</span><br><span class="line">    method <span class="title function_">isEnabled</span><span class="params">()</span></span><br><span class="line">    method <span class="title function_">enable</span><span class="params">()</span></span><br><span class="line">    method <span class="title function_">disable</span><span class="params">()</span></span><br><span class="line">    method <span class="title function_">getVolume</span><span class="params">()</span></span><br><span class="line">    method <span class="title function_">setVolume</span><span class="params">(percent)</span></span><br><span class="line">    method <span class="title function_">getChannel</span><span class="params">()</span></span><br><span class="line">    method <span class="title function_">setChannel</span><span class="params">(channel)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// But each concrete device may have its own implementation.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Tv</span> <span class="keyword">implements</span> <span class="title class_">Device</span> is</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Radio</span> <span class="keyword">implements</span> <span class="title class_">Device</span> is</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// Somewhere in client code.</span></span><br><span class="line">tv = <span class="keyword">new</span> <span class="title class_">Tv</span>();</span><br><span class="line">remote = <span class="keyword">new</span> <span class="title class_">Remote</span>(tv)</span><br><span class="line">remote.pover()</span><br><span class="line"></span><br><span class="line">radio = <span class="keyword">new</span> <span class="title class_">Radio</span>();</span><br><span class="line">remote = <span class="keyword">new</span> <span class="title class_">AdvancedRemote</span>(radio)</span><br></pre></td></tr></table></figure>
+<h3 id="适用性"><a href="#适用性" class="headerlink" title="适用性"></a>适用性</h3><ul>
+<li><p>当你有一个包含一些功能变种的大类（比如，工作在几个不同的数据库服务上）<br>  这个类会变的很难维护，因为任何一个人触碰她的人都需要花费大量的时间去完全理解它。更改功能的某个变种会导致编辑整个类，这可能会引起讨厌的被忽视的错误。</p>
+<p>  Bridge模式将单体类分成几个层次，一个包含另外一个的引用。这些层次中的类可以独立的编辑。它简化了支持，并最大限度地减少了修改现有代码的风险。</p>
+</li>
+<li><p>当你需要在正交（独立）的维度扩展一个类<br>  取代单层次的增长，Bridge模式建议为每个维度创建一个分离的类层次，并且通过引用域来关联这些层次。</p>
+</li>
+<li><p>当你需要在运行时改变实现<br>  尽管它是可选的，Bridge模式允许改变抽象中的实现对象。这就像为一个字段分配一个新值一样简单。</p>
+<p>  顺便说下，这也是为什么许多人对Bridge模式和Strategy模式分不清楚。记住，模式不仅仅是类结构，而是意图（译者注：或者目的）。Bridge模式的目的就是结构化代码。</p>
+</li>
+</ul>
+<h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><ol>
+<li><p>确定你的类是正交维度。这些独立的概念可以是：abstraction/platform, or domain/infrastructure, or front-end/back-end, or interface/implementation.</p>
+</li>
+<li><p>考虑客户端想要干什么，然后把他们描述在基本抽象类中。</p>
+</li>
+<li><p>确定所有平台的能力和抽象需要什么。然后把它们描述在实现接口中。</p>
+</li>
+<li><p>在你的领域中为所有平台创建具体实现类，确定它们都遵循了实现接口。</p>
+</li>
+<li><p>在抽象类中增加一个实现类型的域。然后实现所有抽象方法，同时将大部分工作委托给该域中引用的实现对象。</p>
+</li>
+<li><p>客户端代码应将实现对象传递给抽象的构造函数。它可以根据需要使用抽象对象。</p>
+</li>
+</ol>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>允许建立平台独立代码。</li>
+<li>符合开闭原则。</li>
+<li>对客户端隐藏实现细节。</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>创建多个附加类导致总体代码复杂性增加。</li>
+</ul>
+<h3 id="和其他模式的关系"><a href="#和其他模式的关系" class="headerlink" title="和其他模式的关系"></a>和其他模式的关系</h3><ul>
+<li><p>Bridge是前置设计，让抽象和实现相互独立。Adapter是通过改装使得没有关系的类协作。Adapter通常是在设计完成后使用；Bridge通常是设计时采用。</p>
+</li>
+<li><p>State, Strategy, Bridge (和某种程度上的Adapter) 具有相似的解决结构。它们都是采用分享“句柄/身体”的方式。它们的意图不同，因此它们解决不同的问题。</p>
+</li>
+<li><p>Abstract Factory可与Bridge模式一起使用。当Bridge“接口”的一部分只能与特定的“实现”工作时，这很有用。在这种情况下，工厂可以封装这些关系，对客户端隐藏复杂性。</p>
+</li>
+<li><p>Builder可以构造为Bridge模式：Director将作为接口，Builders将扮演实现角色。</p>
+</li>
+</ul>
+<h3 id="Java中模式的使用"><a href="#Java中模式的使用" class="headerlink" title="Java中模式的使用"></a>Java中模式的使用</h3><p>用例：Bridge模式对这些情况特别适用：跨平台应用，支持多类型的数据库服务，和一些特定类型的API提供者（例如，云平台，社交网络等）合作。</p>
+<p>坚定：可以通过区分控制实体和它所依赖的几个不同的平台来识别Bridge模式。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a target="_blank" rel="noopener" href="https://refactoring.guru/design-patterns/bridge">https://refactoring.guru/design-patterns/bridge</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+              <a href="/tags/Design-Patterns/" rel="tag"># Design Patterns</a>
+              <a href="/tags/Bridge/" rel="tag"># Bridge</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/09/20/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BDecorator/" rel="prev" title="译-设计模式-结构模式之Decorator">
+      <i class="fa fa-chevron-left"></i> 译-设计模式-结构模式之Decorator
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/10/20/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BComposite/" rel="next" title="设计模式-结构模式之Composite">
+      设计模式-结构模式之Composite <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E7%9A%84"><span class="nav-number">1.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">3.</span> <span class="nav-text">解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%BD%E8%B1%A1%EF%BC%88Abstraction%EF%BC%89%E5%92%8C%E5%AE%9E%E7%8E%B0%EF%BC%88Implementation%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">抽象（Abstraction）和实现（Implementation）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="nav-number">6.</span> <span class="nav-text">伪代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E6%80%A7"><span class="nav-number">7.</span> <span class="nav-text">适用性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">8.</span> <span class="nav-text">如何实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9"><span class="nav-number">9.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%92%8C%E5%85%B6%E4%BB%96%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">11.</span> <span class="nav-text">和其他模式的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java%E4%B8%AD%E6%A8%A1%E5%BC%8F%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">12.</span> <span class="nav-text">Java中模式的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">13.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">childe.chen</p>
+  <div class="site-description" itemprop="description">少爷凡隐</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">66</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">childe.chen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

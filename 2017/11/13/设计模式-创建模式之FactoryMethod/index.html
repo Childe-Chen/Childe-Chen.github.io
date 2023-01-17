@@ -1,37 +1,535 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-{% block page_class %}page-post-detail{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="目的Factory Method是创建模式的一种，他在父类中提供一个用来创建对象的接口，但是允许子类修改创建对象的类型。 问题假设你有一个后勤管理应用。应用的第一个版本只需要处理卡车这种运输方式，所以，你有一个Truck类。 不久，你的应用很受欢迎，你收到了许多需求，包括水运。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译-设计模式-创建模式之Factory Method">
+<meta property="og:url" content="http://yoursite.com/2017/11/13/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%BC%8F%E4%B9%8BFactoryMethod/index.html">
+<meta property="og:site_name" content="凡隐的博客">
+<meta property="og:description" content="目的Factory Method是创建模式的一种，他在父类中提供一个用来创建对象的接口，但是允许子类修改创建对象的类型。 问题假设你有一个后勤管理应用。应用的第一个版本只需要处理卡车这种运输方式，所以，你有一个Truck类。 不久，你的应用很受欢迎，你收到了许多需求，包括水运。">
+<meta property="og:locale">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535287368/blog/pattern/creational/Factory-Method/problem.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535287369/blog/pattern/creational/Factory-Method/solution.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535287370/blog/pattern/creational/Factory-Method/solution1.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535287369/blog/pattern/creational/Factory-Method/solution3.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535287371/blog/pattern/creational/Factory-Method/structure.jpg">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535287369/blog/pattern/creational/Factory-Method/pseudocode.jpg">
+<meta property="article:published_time" content="2017-11-13T09:39:28.000Z">
+<meta property="article:modified_time" content="2021-10-30T17:01:17.451Z">
+<meta property="article:author" content="childe.chen">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="Design Patterns">
+<meta property="article:tag" content="Factory Method">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://res.cloudinary.com/childe/image/upload/v1535287368/blog/pattern/creational/Factory-Method/problem.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2017/11/13/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%BC%8F%E4%B9%8BFactoryMethod/">
 
 
-{% block content %}
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+  <title>译-设计模式-创建模式之Factory Method | 凡隐的博客</title>
+  
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">凡隐的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">平凡的世界</p>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/13/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%BC%8F%E4%B9%8BFactoryMethod/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="childe.chen">
+      <meta itemprop="description" content="少爷凡隐">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凡隐的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译-设计模式-创建模式之Factory Method
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-13 17:39:28" itemprop="dateCreated datePublished" datetime="2017-11-13T17:39:28+08:00">2017-11-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-10-31 01:01:17" itemprop="dateModified" datetime="2021-10-31T01:01:17+08:00">2021-10-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h3><p>Factory Method是创建模式的一种，他在父类中提供一个用来创建对象的接口，但是允许子类修改创建对象的类型。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>假设你有一个后勤管理应用。应用的第一个版本只需要处理卡车这种运输方式，所以，你有一个Truck类。</p>
+<p>不久，你的应用很受欢迎，你收到了许多需求，包括水运。<br><span id="more"></span><br><img src="https://res.cloudinary.com/childe/image/upload/v1535287368/blog/pattern/creational/Factory-Method/problem.jpg" alt="problem.png"></p>
+<p>好消息，不是吗？但是你的代码怎么样呢？看起来，你的代码有许多地方要和Truck类耦合。添加Ship类需要改变整个代码库。此外，如果你决定添加另外一个类型的配送方式，你可能需要再次修改整个代码库。</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>Factory Method模式建议通过调用一个特别的“工厂”方法来代替直接创建对象（使用new操作）。构造方法应该移到那个方法中调用。工厂方法返回的对象被称为“产品”。</p>
+<p>乍一看，这么做似乎没有意义。但是，现在你可以在字类中重写工厂方法，并且改变要创建对象的类。我们来看它是怎么工作的：</p>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535287369/blog/pattern/creational/Factory-Method/solution.jpg" alt="solution.png"></p>
+<p>当然，这种方式有个限制：所有的产品必须遵循一个通用接口（Transport）。基类中的工厂方法需要返回这个通用接口。</p>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535287370/blog/pattern/creational/Factory-Method/solution1.jpg" alt="solution1.png"></p>
+<p>字类返回不同的具体产品，它们都有一样的基类或者接口（比如：Truck和Ship都实现了Transport接口）。</p>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535287369/blog/pattern/creational/Factory-Method/solution3.jpg" alt="solution3.png"></p>
+<p>工厂方法的客户端不需要关心它得到产品的类型。它们通过产品接口和所有产品协作。</p>
+<h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p><img src="https://res.cloudinary.com/childe/image/upload/v1535287371/blog/pattern/creational/Factory-Method/structure.jpg" alt="structure.png"></p>
+<ol>
+<li><p>Product为creator和他的字类能够生产的对象定义接口。</p>
+</li>
+<li><p>Concrete Product是Product的不同实现。Concrete Creator将会创建并返回这饿类的实例。</p>
+</li>
+<li><p>Creator声明了一个返回Product类型的工厂方法。在第一个例子中，所有的Concrete Creator必须实现它们的工厂方法。</p>
+<p> 尽管这个名字在现实世界中，生产产品并不是Concrete Creator的主要责任。通常，他有一些处理产品的核心逻辑。</p>
+<p> 打个比方：大的软件开发公司有对开发者进行培训的部门。但是公司的主要功能还是写代码。</p>
+</li>
+<li><p>Concrete Creator实现或者重写基本的工厂方法，创建并返回一个Concrete Product。</p>
+<p> 注意：工厂方法并不总是创建一个新实例。它也可以从缓存中返回一个已经存在的对象。</p>
+</li>
+</ol>
+<h3 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h3><p>这个例子用来展示工厂方法可以被用来创建跨平台的UI元素。工厂放被声明在对话框UI的基类中。它返回抽象的按钮。对话框的积累重写工厂方法并返回特定的按钮。</p>
+<p><img src="https://res.cloudinary.com/childe/image/upload/v1535287369/blog/pattern/creational/Factory-Method/pseudocode.jpg" alt="pseudocode.png"></p>
+<p>结果是使用基本对话框的代码组合了一个UI窗口。对话框通过通用接口和那妞协作。所以，不管工厂方法返回什么类型的按钮，对话框保留基本的功能。</p>
+<p>因此，Factory Method使得类的主要代码独立于所使用的具体产品类。Factory Method让字类担负起选择生产产品所需要的具体类的责任。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The Factory Method pattern is applicable only when there is a</span></span><br><span class="line"><span class="comment">// products hierarchy.</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">Button</span> is</span><br><span class="line">    method <span class="title function_">render</span><span class="params">()</span></span><br><span class="line">    method <span class="title function_">onClick</span><span class="params">(f)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WindowsButton</span> <span class="keyword">implements</span> <span class="title class_">Button</span> is</span><br><span class="line">    method <span class="title function_">render</span><span class="params">(a, b)</span> is</span><br><span class="line">        Create and render a Windows looking button.</span><br><span class="line">    method <span class="title function_">onClick</span><span class="params">(f)</span> is</span><br><span class="line">        Bind a <span class="keyword">native</span> OS click event.</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">HTMLButton</span> <span class="keyword">implements</span> <span class="title class_">Button</span> is</span><br><span class="line">    method <span class="title function_">render</span><span class="params">(a, b)</span> is</span><br><span class="line">        Return an HTML representation of a button.</span><br><span class="line">    method <span class="title function_">onClick</span><span class="params">(f)</span> is</span><br><span class="line">        Bind a web browser click event.</span><br><span class="line"></span><br><span class="line"><span class="comment">// Base factory class. Note that the &quot;factory&quot; is merely a role for the class.</span></span><br><span class="line"><span class="comment">// It should have some core business logic which needs different products to</span></span><br><span class="line"><span class="comment">// be created.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Dialog</span> is</span><br><span class="line">    method <span class="title function_">renderWindow</span><span class="params">()</span> is</span><br><span class="line">        Render other window controls.</span><br><span class="line"></span><br><span class="line">        <span class="type">Button</span> <span class="variable">okButton</span> <span class="operator">=</span> createButton();</span><br><span class="line">        okButton.onClick(closeDialog);</span><br><span class="line">        okButton.render();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Therefore we extract all product creation code to a special</span></span><br><span class="line">    <span class="comment">// factory method.</span></span><br><span class="line">    <span class="keyword">abstract</span> method <span class="title function_">createButton</span><span class="params">()</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Concrete factories extend that method to produce different kinds of products.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WindowsDialog</span> <span class="keyword">extends</span> <span class="title class_">Dialog</span> is</span><br><span class="line">    method <span class="title function_">createButton</span><span class="params">()</span> is</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">WindowsButton</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WebDialog</span> <span class="keyword">extends</span> <span class="title class_">Dialog</span> is</span><br><span class="line">    method <span class="title function_">createButton</span><span class="params">()</span> is</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">HTMLButton</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ClientApplication</span> is</span><br><span class="line">    field dialog: Dialog</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Application picks a factory type depending on configuration</span></span><br><span class="line">    <span class="comment">// or environment.</span></span><br><span class="line">    method <span class="title function_">configure</span><span class="params">()</span> is</span><br><span class="line">        <span class="title function_">if</span> <span class="params">(we are in windows environment)</span> <span class="type">then</span></span><br><span class="line">            <span class="variable">dialog</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">WindowsDialog</span>()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (we are in web environment) <span class="type">then</span></span><br><span class="line">            <span class="variable">dialog</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">WebDialog</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// The client code should work with factories and products through their</span></span><br><span class="line">    <span class="comment">// abstract interfaces. This way it will remain functional even if you add</span></span><br><span class="line">    <span class="comment">// new product types to the program.</span></span><br><span class="line">    method <span class="title function_">main</span><span class="params">()</span> is</span><br><span class="line">        dialog.initialize()</span><br><span class="line">        dialog.render()</span><br></pre></td></tr></table></figure>
+<h3 id="适用性"><a href="#适用性" class="headerlink" title="适用性"></a>适用性</h3><ul>
+<li><p>当你的代码需要和不知道具体类型及一来对象协作时。</p>
+<p>  比如，从多数据源读写数据：文件系统，数据库或者网络。这些资源有着不同的类型，依赖和初始化代码。</p>
+<p>  工厂方法对其他代码隐藏了产品的实现细节。支持一个新的产品类型，你只需要创建一个新的字类并且重写工厂方法。</p>
+</li>
+<li><p>当你想要让用户扩展你的类库或者框架的内部组件时。</p>
+<p>  用户可以轻松的创建特定组件的字类。但是如何让框架识别这个字类并且替换标准的组件？用户必须重写每一个创建标准组件的方法，把它们改成创建自定义子类的对象。这样相当尴尬，不是吗？</p>
+<p>  最好的方法不仅仅是给用户提供扩展某个类，而是将生成组件的代码减少到单个创建方法中。换句话说，提供出一个工厂方法。</p>
+<p>  让我们看看它如何工作。假设你在用一个开源的UI框架写app，你的app必须使用圆边按钮，但是框架只提供了一个方形的。</p>
+<p>  你做的第一件事就是实现一个RoundButton类。但是现在你需要告诉UIFramework类用一个新的按钮类代替默认的那个。</p>
+<p>  为了实现这个，你创建了基础框架的一个子类UIWithRoundButtons，并且重写了createButton方法。这个方法会返回一个Button对象，除了你创建的新子类RoundButton对象。现在，在你的app中，你必须使用UIWithRoundButtons类替代UIFramework来初始化框架。</p>
+</li>
+<li><p>当你想要保存系统资源并且重用存在的对象，而不是重新建立一个时。</p>
+<p>  比如，当你需要处理像数据库连接这类大的或者资源紧张对象。</p>
+<p>  想象下要重用存在的对象需要做什么：</p>
+<ol>
+<li><p>首先，你需要创建一个池子来保存存在的对象。</p>
+</li>
+<li><p>当有人请求一个对象时，你需要在池子中找到一个闲置的对象。</p>
+</li>
+<li><p>然后把它返回给客户端代码。</p>
+</li>
+<li><p>仅仅在池子中没有闲置对象时，你才需要创建一个新的（并且把它放到池子中）。</p>
+<p>这些代码必须放在某个地方。最便利的地方是构造方法。这样子就可以在请求创建对象时去做那些检查。但是，从定义上讲构造方法必须返回新对象，所以它们不能返回存在的实例。</p>
+<p>另外，那些使用你对象的客户端代码也不能包含它。否则，客户端就知道太多你的类中的实现细节。因此，你需要一个独立的方法封装这个逻辑。那就是工厂方法。</p>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><ol>
+<li><p>为所有产品抽离出通用的接口。这个接口应该声明对每个产品都有意义的方法。</p>
+</li>
+<li><p>在创建类中添加一个空的工厂方法。他的签名应当返回产品的接口类型。</p>
+</li>
+<li><p>查看创建者的代码并且找到所有用到产品构造方法的引用。将它们逐一替换为对工厂方法的调用，并将产品创建代码提取到工厂方法。<br> 你可能需要为工厂方法添加临时变量来控制要创建的产品。此时，工厂方法的代码看起来很挫。<br> 它有一个巨大的switch操作来获取要实例化产品的类。不过不用担心，我们马上修复他。</p>
+</li>
+<li><p>现在，在子类中重写工厂方法，并且把父类中对应的case语句挪到子类中。</p>
+</li>
+<li><p>基础创建类中的控制参数也可以用在子类中。</p>
+<p> 比如，你可能有一个Mail作为基类的层级结构，里面有Air和Ground，还有产品类：Plane，Truck和Train。Air正好和Plane匹配，但是Ground可以同时和Truck还有Train匹配。你可以创建一个新的子类来处理这两种情况，但是还有一种处理方式。客户端代码向Ground的工厂方法传递一个参数来控制它想要的产品。</p>
+</li>
+<li><p>如果基本工厂方法在移动后变成空的了，你可以把它标志成抽象方法。</p>
+</li>
+</ol>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><p>遵循开闭原则。</p>
+</li>
+<li><p>避免产品和使用它们代码的耦合。</p>
+</li>
+<li><p>把创建代码都移动到一个地方，简化了代码。</p>
+</li>
+<li><p>简化添加新产品的编程。</p>
+</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>需要额外的子类。</li>
+</ul>
+<h3 id="和其他模式的关系"><a href="#和其他模式的关系" class="headerlink" title="和其他模式的关系"></a>和其他模式的关系</h3><ul>
+<li><p>通常，设计从使用Factory Method开始（比较简单，并且可以通过子类实现定制），逐渐演变到Abstract Factory，Prototype，或者Builder（更加复杂，但更灵活），因为设计者发现它们需要更灵活的程序。</p>
+</li>
+<li><p>Abstract Factory类通常使用工厂方法实现，但也可以使用Prototype实现。</p>
+</li>
+<li><p>Factory Method可以和Iterator单独使用，让集合子类返回正确的迭代器。</p>
+</li>
+<li><p>Prototype不需要子类，但是需要一个“初始”操作。Factory Method需要子类，但是不需要初始化这个步骤。</p>
+</li>
+<li><p>Factory Method是一个专业化的Template Method。另一方面，Factory Method常常作为一个大Template Method的一个步骤。</p>
+</li>
+</ul>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>工厂方法是一个用来解决创建产品对象时没有指定具体类的问题的设计模式。</p>
+<p>工厂方法定义了一个方法，用来替代直接调用构造方法（new操作）。子类可以重写这个方法来改变要创建对象的类。</p>
+<p>If you can’t figure out the difference between Factories, Factory Method &amp; Abstract Factory patterns, then read our Factory Comparison guide.<br>如果你分不清楚Factories，Factory Method和Abstract Factory，可以阅读<a target="_blank" rel="noopener" href="https://refactoring.guru/design-patterns/factory-comparison">工厂比较指南（待译）</a>。</p>
+<h3 id="在Java中的使用"><a href="#在Java中的使用" class="headerlink" title="在Java中的使用"></a>在Java中的使用</h3><ul>
+<li><p>用例</p>
+<p>  java.util.Calendar#getInstance()</p>
+<p>  java.util.ResourceBundle#getBundle()</p>
+<p>  java.text.NumberFormat#getInstance()</p>
+<p>  java.nio.charset.Charset#forName()</p>
+<p>  java.net.URLStreamHandlerFactory#createURLStreamHandler(String) (Returns different singleton objects, depending on a protocol)</p>
+<p>  java.util.EnumSet#of()</p>
+<p>  javax.xml.bind.JAXBContext#createMarshaller() and other similar methods.</p>
+</li>
+<li><p>鉴定</p>
+<p>  工厂方法可以通过创建方法来识别，这些方法从具体类创建对象，但将它们作为抽象类型或接口的对象返回。</p>
+</li>
+</ul>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自： <a target="_blank" rel="noopener" href="https://refactoring.guru/design-patterns/factory-method">https://refactoring.guru/design-patterns/factory-method</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+              <a href="/tags/Design-Patterns/" rel="tag"># Design Patterns</a>
+              <a href="/tags/Factory-Method/" rel="tag"># Factory Method</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/11/02/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8B%E5%B0%8F%E7%BB%93/" rel="prev" title="设计模式-结构模式之小结">
+      <i class="fa fa-chevron-left"></i> 设计模式-结构模式之小结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/11/14/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%88%9B%E5%BB%BA%E6%A8%A1%E5%BC%8F%E4%B9%8BAbstractFactory/" rel="next" title="译-设计模式-创建模式之Abstract Factory">
+      译-设计模式-创建模式之Abstract Factory <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E7%9A%84"><span class="nav-number">1.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">3.</span> <span class="nav-text">解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="nav-number">5.</span> <span class="nav-text">伪代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E6%80%A7"><span class="nav-number">6.</span> <span class="nav-text">适用性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">7.</span> <span class="nav-text">如何实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9"><span class="nav-number">8.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">9.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%92%8C%E5%85%B6%E4%BB%96%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">10.</span> <span class="nav-text">和其他模式的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8Java%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">12.</span> <span class="nav-text">在Java中的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">13.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">childe.chen</p>
+  <div class="site-description" itemprop="description">少爷凡隐</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">66</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">childe.chen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

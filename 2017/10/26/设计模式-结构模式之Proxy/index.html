@@ -1,37 +1,500 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
-{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-{% block page_class %}page-post-detail{% endblock %}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="意图Proxy是结构模式的一种，它能够让你为另外一个对象提供一个替身或者占位符来控制对它的访问。 问题为什么要控制对对象的访问？比如：你有一个需要消耗大量系统资源的对象。你时不时会用到它，但不是一直使用。 因此，这个对象不用再程序启动时创建，而是当真正需要它的时候再创建。每个用到这个对象的客户端可能都有一些延迟实例化代码。显而易见，它导致了大量重复代码。 理想状态下，我们可以直接在对象类中加入代码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="译-设计模式-结构模式之Proxy">
+<meta property="og:url" content="http://yoursite.com/2017/10/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BProxy/index.html">
+<meta property="og:site_name" content="凡隐的博客">
+<meta property="og:description" content="意图Proxy是结构模式的一种，它能够让你为另外一个对象提供一个替身或者占位符来控制对它的访问。 问题为什么要控制对对象的访问？比如：你有一个需要消耗大量系统资源的对象。你时不时会用到它，但不是一直使用。 因此，这个对象不用再程序启动时创建，而是当真正需要它的时候再创建。每个用到这个对象的客户端可能都有一些延迟实例化代码。显而易见，它导致了大量重复代码。 理想状态下，我们可以直接在对象类中加入代码">
+<meta property="og:locale">
+<meta property="og:image" content="https://res.cloudinary.com/childe/image/upload/v1535288039/blog/pattern/structural/proxy/structure.jpg">
+<meta property="article:published_time" content="2017-10-26T10:46:26.000Z">
+<meta property="article:modified_time" content="2021-10-30T17:01:17.454Z">
+<meta property="article:author" content="childe.chen">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="Design Patterns">
+<meta property="article:tag" content="Proxy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://res.cloudinary.com/childe/image/upload/v1535288039/blog/pattern/structural/proxy/structure.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2017/10/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BProxy/">
 
 
-{% block content %}
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+  <title>译-设计模式-结构模式之Proxy | 凡隐的博客</title>
+  
 
-    <div class="post-spread">
-      {% if theme.jiathis %}
-        {% include '_partials/share/jiathis.swig' %}
-      {% elseif theme.baidushare %}
-        {% include '_partials/share/baidushare.swig' %}
-      {% elseif theme.add_this_id %}
-        {% include '_partials/share/add-this.swig' %}
-      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
-        {% include '_partials/share/duoshuo_share.swig' %}
-      {% endif %}
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">凡隐的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">平凡的世界</p>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BProxy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="childe.chen">
+      <meta itemprop="description" content="少爷凡隐">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凡隐的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          译-设计模式-结构模式之Proxy
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-10-26 18:46:26" itemprop="dateCreated datePublished" datetime="2017-10-26T18:46:26+08:00">2017-10-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-10-31 01:01:17" itemprop="dateModified" datetime="2021-10-31T01:01:17+08:00">2021-10-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="意图"><a href="#意图" class="headerlink" title="意图"></a>意图</h3><p>Proxy是结构模式的一种，它能够让你为另外一个对象提供一个替身或者占位符来控制对它的访问。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>为什么要控制对对象的访问？比如：你有一个需要消耗大量系统资源的对象。你时不时会用到它，但不是一直使用。</p>
+<p>因此，这个对象不用再程序启动时创建，而是当真正需要它的时候再创建。每个用到这个对象的客户端可能都有一些延迟实例化代码。显而易见，它导致了大量重复代码。</p>
+<p>理想状态下，我们可以直接在对象类中加入代码，但不总是这样。比如，这是第三方库中的类。<br><span id="more"></span></p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>Proxy模式建议创建一个和原服务对象遵循相同接口的替代类。当接收到客户端的请求时，代理对象创建一个服务对象的实例并把真正工作委托给他。</p>
+<p>但是有什么好处呢？你可以在调用真正服务对象方法之前（或之后）在代理类中加入一些代码。因为代理和服务对象遵循相同的接口，它可以传递服务对象可以接受的任何代码。</p>
+<h3 id="现实世界类比"><a href="#现实世界类比" class="headerlink" title="现实世界类比"></a>现实世界类比</h3><h4 id="支票"><a href="#支票" class="headerlink" title="支票"></a>支票</h4><p>支票是一种文件，可以命令银行从个人账户支付特定金额给持有支票的人。支票和现金都有一个通用的接口：可以用作付款。因此，支票是一大堆现金的代理。</p>
+<p>站在消费者角度看，支票很棒，因为没有必要携带大量的现金。对于店主来说，他们也很好，因为可以在最近的银行兑换现金。</p>
+<h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p><img src="https://res.cloudinary.com/childe/image/upload/v1535288039/blog/pattern/structural/proxy/structure.jpg" alt="strcutrue"></p>
+<ol>
+<li><p>Service interface为Service和Proxy生命了通用接口。</p>
+</li>
+<li><p>Service是一个提供有用业务逻辑的类。</p>
+</li>
+<li><p>Proxy有一个持有Service对象的字段。Proxy的方法做一些中间工作，并且大部分时间将请求传递给服务对象的相同方法。</p>
+<p> 大多情况下，Proxy管理它们的Service对象的声明周期。</p>
+</li>
+<li><p>Client应该同Service和Proxy通用接口协作。这样就可以把Proxy对象传递给任何期望一个Service对象的代码。</p>
+</li>
+</ol>
+<h3 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h3><p>在这个例子中，Proxy模式帮助实现懒实例化并且为一个低效的第三方Youtube集成库做缓存。</p>
+<p>原视频下载类在之前已经下载过的情况下也会再去下载这个视频。代理类仅会使用原下载器下载一次相同的视频，然后把它缓存下来，随后相同的请求会直接返回缓存。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The interface of a remote service.</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">ThirdPartyYoutubeLib</span> is</span><br><span class="line">    method <span class="title function_">listVideos</span><span class="params">()</span></span><br><span class="line">    method <span class="title function_">getVideoInfo</span><span class="params">(id)</span></span><br><span class="line">    method <span class="title function_">downloadVideo</span><span class="params">(id)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Concrete implementation of a service connector. Methods of this class can</span></span><br><span class="line"><span class="comment">// request various info from youtube. Request speed depends on a user&#x27;s internet</span></span><br><span class="line"><span class="comment">// connection as wells as Youtube&#x27;s. Application will slow down if a lot of</span></span><br><span class="line"><span class="comment">// requests will be fired at the same time, even if they are requesting the</span></span><br><span class="line"><span class="comment">// same info.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ThirdPartyYoutubeClass</span> is</span><br><span class="line">    method <span class="title function_">listVideos</span><span class="params">()</span> is</span><br><span class="line">        Send API request to Youtube.</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">getVideoInfo</span><span class="params">(id)</span> is</span><br><span class="line">        Get a meta information about some video.</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">downloadVideo</span><span class="params">(id)</span> is</span><br><span class="line">        Download video file from Youtube.</span><br><span class="line"></span><br><span class="line"><span class="comment">// On the other hand, to save some bandwidth, we can cache request results and</span></span><br><span class="line"><span class="comment">// keep them for some time. But it might be impossible to put such code directly</span></span><br><span class="line"><span class="comment">// to the service class: it could be provided by third party library or/and</span></span><br><span class="line"><span class="comment">// defined as final. That is why we put the caching code to a new proxy class</span></span><br><span class="line"><span class="comment">// which implements the same interface as a service class. It is going to</span></span><br><span class="line"><span class="comment">// delegate to the service object only when the real requests have to be sent.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CachedYoutubeClass</span> <span class="keyword">implements</span> <span class="title class_">ThirdPartyYoutubeLib</span> is</span><br><span class="line">    <span class="keyword">private</span> field service: ThirdPartyYoutubeClass</span><br><span class="line">    <span class="keyword">private</span> field listCache, videoCache</span><br><span class="line">    field needReset</span><br><span class="line"></span><br><span class="line">    constructor <span class="title function_">CachedYoutubeClass</span><span class="params">(service: ThirdPartyYoutubeLib)</span> is</span><br><span class="line">        <span class="built_in">this</span>.service = service</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">listVideos</span><span class="params">()</span> is</span><br><span class="line">        <span class="title function_">if</span> <span class="params">(listCache == <span class="literal">null</span> || needReset)</span></span><br><span class="line">            listCache = service.listVideos()</span><br><span class="line">        <span class="keyword">return</span> listCache</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">getVideoInfo</span><span class="params">(id)</span> is</span><br><span class="line">        <span class="title function_">if</span> <span class="params">(videoCache == <span class="literal">null</span> || needReset)</span></span><br><span class="line">            videoCache = service.getVideoInfo(id)</span><br><span class="line">        <span class="keyword">return</span> videoCache</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">downloadVideo</span><span class="params">(id)</span> is</span><br><span class="line">        <span class="title function_">if</span> <span class="params">(!downloadExists(id)</span> || needReset)</span><br><span class="line">            service.downloadVideo(id)</span><br><span class="line"></span><br><span class="line"><span class="comment">// The GUI class, which used to work with a service object stays unchanged. But</span></span><br><span class="line"><span class="comment">// only as long as it works with the service object through an interface. We can</span></span><br><span class="line"><span class="comment">// safely pass here a proxy object instead of a real service object since both</span></span><br><span class="line"><span class="comment">// of them implement the same interface.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">YoutubeManager</span> is</span><br><span class="line">    <span class="keyword">protected</span> field service: ThirdPartyYoutubeLib</span><br><span class="line"></span><br><span class="line">    constructor <span class="title function_">YoutubeManager</span><span class="params">(service: ThirdPartyYoutubeLib)</span> is</span><br><span class="line">        <span class="built_in">this</span>.service = service</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">renderVideoPage</span><span class="params">()</span> <span class="type">is</span></span><br><span class="line">        <span class="variable">info</span> <span class="operator">=</span> service.getVideoInfo()</span><br><span class="line">        Render the video page.</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">renderListPanel</span><span class="params">()</span> <span class="type">is</span></span><br><span class="line">        <span class="variable">list</span> <span class="operator">=</span> service.listVideos()</span><br><span class="line">        Render the list of video thumbnails.</span><br><span class="line"></span><br><span class="line">    method <span class="title function_">reactOnUserInput</span><span class="params">()</span> is</span><br><span class="line">        <span class="title function_">renderVideoPage</span><span class="params">()</span></span><br><span class="line">        renderListPanel()</span><br><span class="line"></span><br><span class="line"><span class="comment">// Application can configure proxies on the fly.</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Application</span> is</span><br><span class="line">    method <span class="title function_">init</span><span class="params">()</span> <span class="type">is</span></span><br><span class="line">        <span class="variable">youtubeService</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThirdPartyYoutubeClass</span>()</span><br><span class="line">        youtubeProxy = <span class="keyword">new</span> <span class="title class_">CachedYoutubeClass</span>(youtubeService)</span><br><span class="line">        manager = <span class="keyword">new</span> <span class="title class_">YoutubeManager</span>(youtubeProxy)</span><br><span class="line">        manager.reactOnUserInput()</span><br></pre></td></tr></table></figure>
+<h3 id="适用性"><a href="#适用性" class="headerlink" title="适用性"></a>适用性</h3><ul>
+<li><p>懒初始化（虚拟代理）。当你有一个需要从文件系统，网络或者数据库加载数据的重量级对象时。</p>
+<p>  不是在应用启动时加载数据，而是将对象的初始化延迟到需要它的时间。</p>
+</li>
+<li><p>访问控制（保护代理）。当一个程序有不同类型的用户并且你想阻止未授权用户对保护对象的访问。比如，当对象是操作系统的关键部分，并且程序（包括恶意的）是他们的客户端。</p>
+<p>  代理会在每次请求时检查客户端的证书，只会让拥有正确访问权限请求通过。</p>
+</li>
+<li><p>本地执行一个远程服务（远程代理）。当一个真实服务对象在远程服务器上时。</p>
+<p>  在这种情况下，代理会把客户端的请求通过网络传递到远程服务，处理所有网络传输细节（译者注：Dubbo等RPC框架）。</p>
+</li>
+<li><p>缓存对象（智能引用）。当你需要混存客户端的请求并且管理它们的生命周期时（当结果比较重时）时。</p>
+<p>  Proxy能够统计引用服务对象或者缓存结果的数量。当所有的引用被释放，代理就可以销毁它追踪的对象（比如，终止数据库链接）。</p>
+<p>  Proxy还可以追踪客户端是否改变了服务对象。它可以重用未改变的对象并且保存系统资源。</p>
+</li>
+<li><p>请求日志（日志代理）。当你需要保留一个服务对象的请求历史。</p>
+<p>  Proxy可以在传递给服务对象之前记录下每次请求。</p>
+</li>
+</ul>
+<h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><ol>
+<li><p>从一个服务类抽象出代理和服务对象的通用接口。你可能需要创建一个服务类的子类作为被代理类，因为服务类可能是闭合的。</p>
+</li>
+<li><p>创建一个代理类。你应该用一个字段来持有服务对象的强引用。大多情况下，代理类自己创建它自己需要的服务对象。少数情况下，客户端通过构造代理类的构造方法把服务传递给代理。</p>
+</li>
+<li><p>根据目的来实现代理方法。大多情况下，在做一些事情后，代理类应该把工作委托给服务对象。</p>
+</li>
+<li><p>想想可以引入工厂对象来决定客户端需要什么样的对象，代理或真正的服务。另一方面，这个逻辑也可以在一个代理类中的一个创建方法中。</p>
+</li>
+<li><p>考虑添加懒初始化服务对象。这对比较重的对象很有用处。</p>
+</li>
+</ol>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li><p>客户端无感知情况下控制对对象的访问。</p>
+</li>
+<li><p>可以在服务对象没有准备好时开始工作。</p>
+</li>
+<li><p>管理服务对象的生命周期，即使客户端并不关心。</p>
+</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>延迟响应。</li>
+</ul>
+<h3 id="和其他模式的关系"><a href="#和其他模式的关系" class="headerlink" title="和其他模式的关系"></a>和其他模式的关系</h3><ul>
+<li><p>Adapter提供不同的接口达到目的，而Proxy提供相同的接口。Decorator提供增强的接口。</p>
+</li>
+<li><p>Facade和Proxy很像，它们给复杂的实体提供缓冲并且初始化它。不像Facade，Proxy模式和服务对象遵循一样的接口，他们是通用的。</p>
+</li>
+<li><p>Decorator和Proxy结构相似，但目的不同。两者均采用组合的方式来把工作委托给其他对象。然而，Proxy自己管理服务对象的生命周期，而Decorator由客户端管理。</p>
+</li>
+</ul>
+<h3 id="在Java中的使用"><a href="#在Java中的使用" class="headerlink" title="在Java中的使用"></a>在Java中的使用</h3><p>用例：虽然代理模式在大多数Java程序中不是常客，但在某些特殊情况下，它是非常方便的。当你想在一些现有的类的对象中添加一些额外的行为而不改变客户端代码时，它是不可取代的。</p>
+<p>在标准Java库中有一些例子：</p>
+<ul>
+<li><p>java.lang.reflect.Proxy</p>
+</li>
+<li><p>java.rmi.*</p>
+</li>
+<li><p>javax.ejb.EJB <a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/25514361/when-using-ejb-does-each-managed-bean-get-its-own-ejb-instance">(注释)</a></p>
+</li>
+<li><p>javax.inject.Inject <a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/29651008/field-getobj-returns-all-nulls-on-injected-cdi-managed-beans-while-manually-i/29672591#29672591">(注释)</a></p>
+</li>
+<li><p>javax.persistence.PersistenceContext</p>
+</li>
+</ul>
+<p>鉴定：代理将真正的工作全部委托给其他对象。每个代理方法应该最终引用一个服务对象，除非代理是服务的一个子类。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a target="_blank" rel="noopener" href="https://refactoring.guru/design-patterns/proxy">https://refactoring.guru/design-patterns/proxy</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"># 设计模式</a>
+              <a href="/tags/Design-Patterns/" rel="tag"># Design Patterns</a>
+              <a href="/tags/Proxy/" rel="tag"># Proxy</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BFacade/" rel="prev" title="译-设计模式-结构模式之Facade">
+      <i class="fa fa-chevron-left"></i> 译-设计模式-结构模式之Facade
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/10/31/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BFlyweight/" rel="next" title="译-设计模式-结构模式之Flyweight">
+      译-设计模式-结构模式之Flyweight <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%84%8F%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">意图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">3.</span> <span class="nav-text">解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%B0%E5%AE%9E%E4%B8%96%E7%95%8C%E7%B1%BB%E6%AF%94"><span class="nav-number">4.</span> <span class="nav-text">现实世界类比</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%AF%E7%A5%A8"><span class="nav-number">4.1.</span> <span class="nav-text">支票</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="nav-number">6.</span> <span class="nav-text">伪代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E6%80%A7"><span class="nav-number">7.</span> <span class="nav-text">适用性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">8.</span> <span class="nav-text">如何实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9"><span class="nav-number">9.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%92%8C%E5%85%B6%E4%BB%96%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">11.</span> <span class="nav-text">和其他模式的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8Java%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">12.</span> <span class="nav-text">在Java中的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">13.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">childe.chen</p>
+  <div class="site-description" itemprop="description">少爷凡隐</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">66</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">childe.chen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
