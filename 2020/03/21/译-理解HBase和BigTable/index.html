@@ -228,16 +228,16 @@
 <p>非常不幸的是，Hbase和BigTable这两个伟大的系统在名称中都包含table和base这两个词，这往往导致和RDBMS（例如我自己）产生混淆。</p>
 <p>这篇文章旨在从概念角度描述这些分布式数据存储系统。相信在你读完后会对何时使用HBase和传统数据库有更明智的决定。</p>
 <span id="more"></span>
-<h3 id="数据解释"><a href="#数据解释" class="headerlink" title="数据解释"></a>数据解释</h3><p>幸运的是<a href="http://labs.google.com/papers/bigtable.html">Google’s BigTable Paper</a>清晰的解释了BigTable是什么。这是“数据模型”一节的第一段话：<strong>BigTable是一个稀疏，分布，持久化，多维度有序map。</strong></p>
+<h3 id="数据解释"><a href="#数据解释" class="headerlink" title="数据解释"></a>数据解释</h3><p>幸运的是<a target="_blank" rel="noopener" href="http://labs.google.com/papers/bigtable.html">Google’s BigTable Paper</a>清晰的解释了BigTable是什么。这是“数据模型”一节的第一段话：<strong>BigTable是一个稀疏，分布，持久化，多维度有序map。</strong></p>
 <p><strong>注意：</strong> 请牢记这个定义。</p>
 <p>BigTable白皮书对这句话这么解释：<strong>这个map使用row key，column key和一个时间戳来做索引，map中每个值都是一个无意义的字节数组。</strong></p>
-<p>按照这些原则，Hadoop百科的<a href="http://wiki.apache.org/hadoop/Hbase/HbaseArchitecture">HBase Architecture</a>白皮书中这么描述：<strong>HBase使用的数据模型和BigTable非常相似。用户将数据行存储在带标签的表中。一个数据行有一个有序的key和一个任意数量的column。这个表存储是稀疏的，如果用户愿意，同一个表中行可以有疯狂变化的column。</strong></p>
+<p>按照这些原则，Hadoop百科的<a target="_blank" rel="noopener" href="http://wiki.apache.org/hadoop/Hbase/HbaseArchitecture">HBase Architecture</a>白皮书中这么描述：<strong>HBase使用的数据模型和BigTable非常相似。用户将数据行存储在带标签的表中。一个数据行有一个有序的key和一个任意数量的column。这个表存储是稀疏的，如果用户愿意，同一个表中行可以有疯狂变化的column。</strong></p>
 <p>尽管这些看起来很神秘，但当你一次理解一个关键词就会很有感觉了。我将以以下顺序来讨论他们：map，持久化（persistent），分布式（distributed），有序的（sorted），多维的（multidimensional），和稀疏的（sparse）。</p>
-<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>HBase/BigTable的核心是<a href="http://en.wikipedia.org/wiki/Associative_array">map</a>。基于不同的编程语言，您可能更熟悉相关术语PHP的array，Python的dictionary，Ruby的Hash或者JavaScript的Object。</p>
-<p>从维基百科的文章中我们知道，一个map就是“一个抽象的数据类型，由一组key和一组value组成，其中每个key关联一个value。”。使用<a href="http://en.wikipedia.org/wiki/JSON">JavaScript Object Notetion</a>来表示一个简单的map结构如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;zzzzz&quot;</span> : <span class="string">&quot;woot&quot;</span>,</span><br><span class="line">  <span class="string">&quot;xyz&quot;</span> : <span class="string">&quot;hello&quot;</span>,</span><br><span class="line">  <span class="string">&quot;aaaab&quot;</span> : <span class="string">&quot;world&quot;</span>,</span><br><span class="line">  <span class="string">&quot;1&quot;</span> : <span class="string">&quot;x&quot;</span>,</span><br><span class="line">  <span class="string">&quot;aaaaa&quot;</span> : <span class="string">&quot;y&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>HBase/BigTable的核心是<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Associative_array">map</a>。基于不同的编程语言，您可能更熟悉相关术语PHP的array，Python的dictionary，Ruby的Hash或者JavaScript的Object。</p>
+<p>从维基百科的文章中我们知道，一个map就是“一个抽象的数据类型，由一组key和一组value组成，其中每个key关联一个value。”。使用<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/JSON">JavaScript Object Notetion</a>来表示一个简单的map结构如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;zzzzz&quot;</span> : <span class="string">&quot;woot&quot;</span>,</span><br><span class="line">  <span class="string">&quot;xyz&quot;</span> : <span class="string">&quot;hello&quot;</span>,</span><br><span class="line">  <span class="string">&quot;aaaab&quot;</span> : <span class="string">&quot;world&quot;</span>,</span><br><span class="line">  <span class="string">&quot;1&quot;</span> : <span class="string">&quot;x&quot;</span>,</span><br><span class="line">  <span class="string">&quot;aaaaa&quot;</span> : <span class="string">&quot;y&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="persistent"><a href="#persistent" class="headerlink" title="persistent"></a>persistent</h3><p>持久化意味着在你把数据放到这个特殊的map后，他们将持久存在。这个和其他任何持久化存储没有区别，比如：文件系统上的文件。</p>
 <h3 id="distributed"><a href="#distributed" class="headerlink" title="distributed"></a>distributed</h3><p>HBase和BigTable都建立在分布式的文件系统之上，，因此基础文件存储可以分布在一系列独立的计算机中。 </p>
-<p>Hbase底层存储可以是<a href="http://hadoop.apache.org/core/docs/r0.16.4/hdfs_design.html">Hadoop的分布式文件系统（HDFS）</a>或<a href="http://en.wikipedia.org/wiki/Amazon_S3">Amazon的简单存储服务（S3）</a>，而BigTable底层是<a href="http://labs.google.com/papers/gfs.html">Google文件系统（GFS）</a>。</p>
+<p>Hbase底层存储可以是<a target="_blank" rel="noopener" href="http://hadoop.apache.org/core/docs/r0.16.4/hdfs_design.html">Hadoop的分布式文件系统（HDFS）</a>或<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Amazon_S3">Amazon的简单存储服务（S3）</a>，而BigTable底层是<a target="_blank" rel="noopener" href="http://labs.google.com/papers/gfs.html">Google文件系统（GFS）</a>。</p>
 <p>数据在多个参与节点上的复制方式，和RAID系统中对数据跨磁盘的传输类似。</p>
 <p>这里我们不关心底层使用的是那种分布式系统的实现。重要的是理解他是分布式的，它提供了一种在集群失败时对数据的保护。</p>
 <h3 id="sorted"><a href="#sorted" class="headerlink" title="sorted"></a>sorted</h3><p>与大多数map的实现不同，在HBase/BigTable中，key/value对保持的严格的字母顺序。也就是说，row key “aaaa“的下一个row key 应该是“aaaab”，他们和“zzzzz”里的很远。</p>
@@ -265,15 +265,15 @@
 <p>每个列族都可以有自己的规则来决定一个cell（cell通过其row key/column进行标识）中保存多少个数据版本。大多数情况下，应用请求一个cell的数据并不会指定时间戳，通常，HBase/BigTable会返回最近的一个版本（时间戳最大的那个），因为他是按照降序的方式存储的。</p>
 <p>如果应用请求时指定了一个时间戳，那么HBase将会返回时间戳相等的或者小于给定时间戳最大的cell。</p>
 <p>使用我们假想的HBase表，通过row/column方式查询“aaaaa”/“A:foo”将会返回“y”，而通过row/column/timestamp方式查询“aaaaa”/“A:foo”/10将会返回“m”。查询“aaaaa”/“A:foo”/2将会返回null。</p>
-<p><code>阅读注：关于时间戳的理解，可以看看另一篇文章来加深理解--&gt;</code><a href="https://www.ngdata.com/bending-time-in-hbase">Bending time in HBase</a><code>&lt;--</code></p>
+<p><code>阅读注：关于时间戳的理解，可以看看另一篇文章来加深理解--&gt;</code><a target="_blank" rel="noopener" href="https://www.ngdata.com/bending-time-in-hbase">Bending time in HBase</a><code>&lt;--</code></p>
 <h3 id="sparse"><a href="#sparse" class="headerlink" title="sparse"></a>sparse</h3><p>最后一个关键词是sparce（稀疏的）。正如上面提到的，一个给定的行在每个列族中都可以有任意数量的列，或者压根没有。稀疏的另一种类型是行间隙，这意味着key之间可能存在间隙。</p>
 <p>如果您思考HBase/BigTable同本文一样是基于map而不是类比RDBMS中的概念，那对稀疏将会有比较好的理解。</p>
 <h3 id="就这样吧"><a href="#就这样吧" class="headerlink" title="就这样吧"></a>就这样吧</h3><p>我希望这可以帮助你从概念上HBase的数据模型。</p>
 <p>一如既往，我期待您的想法，评论和建议。</p>
 <hr>
-<h3 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h3><p>以上是我对整个博文蹩脚的理解，其实对于稀疏的理解，个人认为还不是很直观，最好是结合HBase的<a href="https://hbase.apache.org/book.html#physical.view">物理视图</a>来加以辅助，这样会更直观。</p>
+<h3 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h3><p>以上是我对整个博文蹩脚的理解，其实对于稀疏的理解，个人认为还不是很直观，最好是结合HBase的<a target="_blank" rel="noopener" href="https://hbase.apache.org/book.html#physical.view">物理视图</a>来加以辅助，这样会更直观。</p>
 <p>十分感谢Jim Wilson的这篇文章，让我比较清楚的了解HBase的基础概念。不恰当的类比害死人，希望初学者不要再拿HBase和关系型数据库做对比来入门了，那些文章简直看的是云里雾里，不知所云。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a href="https://dzone.com/articles/understanding-hbase-and-bigtab">https://dzone.com/articles/understanding-hbase-and-bigtab</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a target="_blank" rel="noopener" href="https://dzone.com/articles/understanding-hbase-and-bigtab">https://dzone.com/articles/understanding-hbase-and-bigtab</a></p>
 
     </div>
 

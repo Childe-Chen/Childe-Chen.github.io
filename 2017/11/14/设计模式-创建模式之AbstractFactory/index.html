@@ -310,7 +310,7 @@
 <h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>Abstract Factory是创建型模式的一种，用来解决创建没有制定具体类的产品系列。</p>
 <p>Abstract Factory定义了一个创建所有不同产品的接口，但是把创建真正产品的实现放在具体工厂类中。美国工厂类型都代表一个某些产品的变种。</p>
 <p>客户端代码不是直接调用构造方法（new操作）而是调用一个工厂对象的创建方法来创建对象。因为一个工厂代表了一个产品的变种，它的产品都是兼容的。</p>
-<p>客户端只通过抽象接口和工厂还有产品协作。它允许相同的客户端代码和不同的产品协作。你只需要创建一新的具体工厂类，并把它传递给客户端代码就行。如果你分不清楚Factories，Factory Method和Abstract Factory，可以阅读<a href="https://refactoring.guru/design-patterns/factory-comparison">工厂比较指南（待译）</a>。</p>
+<p>客户端只通过抽象接口和工厂还有产品协作。它允许相同的客户端代码和不同的产品协作。你只需要创建一新的具体工厂类，并把它传递给客户端代码就行。如果你分不清楚Factories，Factory Method和Abstract Factory，可以阅读<a target="_blank" rel="noopener" href="https://refactoring.guru/design-patterns/factory-comparison">工厂比较指南（待译）</a>。</p>
 <h3 id="Java的模式的使用"><a href="#Java的模式的使用" class="headerlink" title="Java的模式的使用"></a>Java的模式的使用</h3><p>用例：许多框架和类库采用抽象工厂模式来提供扩展和定制它们的标准组件。</p>
 <p>Java的核心包中应用如下：</p>
 <pre><code>javax.xml.parsers.DocumentBuilderFactory#newInstance()
@@ -319,7 +319,7 @@ javax.xml.transform.TransformerFactory#newInstance()
 
 javax.xml.xpath.XPathFactory#newInstance()
 </code></pre><p>鉴定：该模式很容易通过返回工厂对象的方法来识别。然后，工厂用于创建特定的子组件。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a href="https://refactoring.guru/design-patterns/abstract-factory">https://refactoring.guru/design-patterns/abstract-factory</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a target="_blank" rel="noopener" href="https://refactoring.guru/design-patterns/abstract-factory">https://refactoring.guru/design-patterns/abstract-factory</a></p>
 
     </div>
 

@@ -224,7 +224,7 @@
 
       
         <h3 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h3><p>结构设计模式使的我们简单快速的建立类的层级及不同类之间的关系，明确不同层级间的责任和边界，让各个模块、系统间相互独立并很好的协作。</p>
-<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><h4 id="Adapter模式"><a href="#Adapter模式" class="headerlink" title="Adapter模式"></a><a href="http://childe.net.cn/2017/09/15/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BAdapter/">Adapter模式</a></h4><p>适配器的目的是使不兼容接口间的可正常进行协作，它允许我们新增接口。主要用来解决下面两个问题：</p>
+<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><h4 id="Adapter模式"><a href="#Adapter模式" class="headerlink" title="Adapter模式"></a><a target="_blank" rel="noopener" href="http://childe.net.cn/2017/09/15/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BAdapter/">Adapter模式</a></h4><p>适配器的目的是使不兼容接口间的可正常进行协作，它允许我们新增接口。主要用来解决下面两个问题：</p>
 <ul>
 <li><p>接口间输入输出不匹配的问题，适配器在无法相互直接使用的接口间加入中间转换层，对数据格式进行转换，使接口间可以顺利协作。</p>
 </li>
@@ -234,7 +234,7 @@
 <span id="more"></span>
 <p>比如像OutputStreamWriter，它在构造方法中接收一个OutputStream作为内部变量。OutputStream并没有提供对String或者char类型的支持，于是OutputStreamWriter就出现了，OutputStreamWriter的基类定义了该接口要实现的功能，然后适配传入的字符串，但是最终还是把输出工作交给了OutputStream。</p>
 <p>Adapter反对完全重新定义一个接口，原文没有对完全重新定义接口作出解释，但是它改变了原有接口，不过也不必太过于纠结于此。只要我们根据设计模式提供的思维方式把问题很好的解决就好。</p>
-<h4 id="Facade模式"><a href="#Facade模式" class="headerlink" title="Facade模式"></a><a href="http://childe.net.cn/2017/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BFacade/">Facade模式</a></h4><p>门面让你为一个复杂的系统，类库或者框架提供一个简单的接口。可用在以下场景：</p>
+<h4 id="Facade模式"><a href="#Facade模式" class="headerlink" title="Facade模式"></a><a target="_blank" rel="noopener" href="http://childe.net.cn/2017/10/21/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BFacade/">Facade模式</a></h4><p>门面让你为一个复杂的系统，类库或者框架提供一个简单的接口。可用在以下场景：</p>
 <ul>
 <li><p>需要一个简单但是功能有限的复杂子系统接口时</p>
 </li>
@@ -242,7 +242,7 @@
 </li>
 </ul>
 <p>上面两个场景在实际场景中很多，比如我们要使用第三方的类库，但是它并没有提供我们想要的接口，于是我们自己创建一个类来对它进行包装，并在这个类中管理三方库中一些对象的生命周期。</p>
-<h4 id="Decorator模式"><a href="#Decorator模式" class="headerlink" title="Decorator模式"></a><a href="http://childe.net.cn/2017/09/20/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BDecorator/">Decorator模式</a></h4><p>装饰器让你在封装包涵对象原有行为的基础上增加新的行为。可用在以下场景：</p>
+<h4 id="Decorator模式"><a href="#Decorator模式" class="headerlink" title="Decorator模式"></a><a target="_blank" rel="noopener" href="http://childe.net.cn/2017/09/20/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BDecorator/">Decorator模式</a></h4><p>装饰器让你在封装包涵对象原有行为的基础上增加新的行为。可用在以下场景：</p>
 <ul>
 <li><p>动态赋予某个对象行为并且不需要修改这个对象的代码</p>
 </li>
@@ -250,7 +250,7 @@
 </li>
 </ul>
 <p>装饰器是对已有接口的增强，它没有改变原有的接口，对使用者完全透明。比如我们会用Collections的synchronizedMap(Map<K,V> m)来让一个HashMap变成线程安全的，但经过增强的HashMap我们使用起来和之前并无不同。Decorator也被称为Wrapper，它们支持递归组合，我们可以根据需要叠加或者移除。它和Composite模式十分相似，但是从模式定义上讲，Composite并不会对接口做增强，只是对下级执行相同的操作并合并结果。</p>
-<h4 id="Proxy模式"><a href="#Proxy模式" class="headerlink" title="Proxy模式"></a><a href="http://childe.net.cn/2017/10/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BProxy/">Proxy模式</a></h4><p>代理模式为另外一个对象提供一个替身或者占位符来控制对它的访问。作用如下：</p>
+<h4 id="Proxy模式"><a href="#Proxy模式" class="headerlink" title="Proxy模式"></a><a target="_blank" rel="noopener" href="http://childe.net.cn/2017/10/26/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BProxy/">Proxy模式</a></h4><p>代理模式为另外一个对象提供一个替身或者占位符来控制对它的访问。作用如下：</p>
 <ul>
 <li><p>懒初始化（虚拟代理）。当你有一个需要从文件系统，网络或者数据库加载数据的重量级对象时。</p>
 </li>
@@ -265,7 +265,7 @@
 </ul>
 <p>代理还分为静态和动态两种，动态代理常用在框架层面。上面列出的几个适用场景在Dubbo中有很好的体现，Dubbo代理了远程的服务，并对其做了缓存和访问控制等相关指标数据。了解Proxy模式去看下Dubbo源码是个不错的选择。</p>
 <p>还是要从主要目的或者说意图上区分模式，Proxy并不像Decorator那样对接口做增强，也不像Adapter定义新的接口，但并不是Proxy做不了这些事情，它可以很轻松的对接口做增强，但那不是他的主要目的。PS：Proxy往往需要管理被代理对象的生命周期。</p>
-<h4 id="Composite模式"><a href="#Composite模式" class="headerlink" title="Composite模式"></a><a href="http://childe.net.cn/2017/10/20/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BComposite/">Composite模式</a></h4><p>Composite模式让我们可以像树一样组合对象，并且允许客户端像操作单个对象一样和这些结构协作。使用该模式前一定要正确梳理清楚现有实体间抽象关系。</p>
+<h4 id="Composite模式"><a href="#Composite模式" class="headerlink" title="Composite模式"></a><a target="_blank" rel="noopener" href="http://childe.net.cn/2017/10/20/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BComposite/">Composite模式</a></h4><p>Composite模式让我们可以像树一样组合对象，并且允许客户端像操作单个对象一样和这些结构协作。使用该模式前一定要正确梳理清楚现有实体间抽象关系。</p>
 <p>当有以下场景时，考量使用该模式：</p>
 <ul>
 <li><p>需要实现一个像树一样有着简单元素和容器的结构。</p>
@@ -275,18 +275,18 @@
 </ul>
 <p>之前接触一个店铺装修系统，用户使用定义好的基本组件组合出不同的网页效果。像系统中的输入框、图片、按钮等是基本的组件（像树的叶子），用户可以使用基本组件组成更复杂的组件放到自定义组件中（像一个树枝），自定义组件和基本组件遵循相同的接口，有着相同的属性和操作。这样，渲染引擎在渲染在将一个画面渲染的时候只需要关注当前画面用了那些组件，不必关心组件式什么类型的，只需要通过接口设置/获取自己需要的属性值即可。</p>
 <p>组合模式和装饰模式很像，都依赖递归组合，但不同的是，装饰器用来增强接口而组合模式只是对接口结果做了合并。不必纠结于如此一点差别。就像黑猫VS白猫，捉到老鼠就是好猫。</p>
-<h4 id="Bridge模式"><a href="#Bridge模式" class="headerlink" title="Bridge模式"></a><a href="http://childe.net.cn/2017/10/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BBridge/">Bridge模式</a></h4><p>桥接模式分离一个巨大的类或者将一组关系相近的类分离成为两个独立的层次结构，抽象和实现，让各自可以独立开发。</p>
+<h4 id="Bridge模式"><a href="#Bridge模式" class="headerlink" title="Bridge模式"></a><a target="_blank" rel="noopener" href="http://childe.net.cn/2017/10/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BBridge/">Bridge模式</a></h4><p>桥接模式分离一个巨大的类或者将一组关系相近的类分离成为两个独立的层次结构，抽象和实现，让各自可以独立开发。</p>
 <p>这个模式提示我们，接口和实现必须分开。不过，现在企业级项目好像没有不这样做的。使用场景如下：</p>
 <ul>
 <li><p>有一个包含一些功能变种的大类（工作在几个不同的数据库服务上） </p>
 </li>
-<li><p>需要在正交（独立）的维度扩展一个类（例子详见<a href="http://childe.net.cn/2017/10/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BBridge/">Bridge模式</a>）</p>
+<li><p>需要在正交（独立）的维度扩展一个类（例子详见<a target="_blank" rel="noopener" href="http://childe.net.cn/2017/10/17/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BBridge/">Bridge模式</a>）</p>
 </li>
 <li><p>需要在运行时改变实现（一个接口多种实现，比如：临时切换系统的支付通道）</p>
 </li>
 </ul>
-<h4 id="Flyweight模式"><a href="#Flyweight模式" class="headerlink" title="Flyweight模式"></a><a href="http://childe.net.cn/2017/10/31/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BFlyweight/">Flyweight模式</a></h4><p>享元来自于拳击界，表示轻量级选手（选手小于111磅）。这个舶来词形象表明这个模式的意图。通过在多个对象见共享对象状态的通用部分而不是让各个对象独自持有的方式来节约内存。我们在系统中常会定义一些常量供不通的对象使用，这也体现了享元模式的思想。在Java的核心类库中，像Integer、Boolean、Long和BigDecimal等都缓存了常用的（最大/小／0等）数值。</p>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>翻译的文章对模式的解释比较浅显简单，可以让我们对模式有一个初步的认知，想要更深入理解和体会设计模式一方面离不开平时做项目时对业务和代码关于模式思考，尝试在编码时采用一些合适的模式，将理论运用到实践中，直观上体验模式带来的好处和问题；另一方面还是要深入读下<a href="https://www.amazon.cn/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%9B%E4%B9%A6-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8F%AF%E5%A4%8D%E7%94%A8%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%9F%BA%E7%A1%80-Erich-Gamma/dp/B001130JN8/ref=sr_1_1?ie=UTF8&amp;qid=1509622266&amp;sr=8-1&amp;keywords=%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">《设计模式》</a>这本书，来加深对模式的理解。个人认为模式的具体实现结构不必拘泥文中说的某种实现形式，它更重要的是要解决什么问题，以及我们可能会碰到什么问题，和优雅解决或者避免这些问题的方法。具体怎样去应用一个模式在单一介绍模式的文章中都有给出。</p>
+<h4 id="Flyweight模式"><a href="#Flyweight模式" class="headerlink" title="Flyweight模式"></a><a target="_blank" rel="noopener" href="http://childe.net.cn/2017/10/31/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F%E4%B9%8BFlyweight/">Flyweight模式</a></h4><p>享元来自于拳击界，表示轻量级选手（选手小于111磅）。这个舶来词形象表明这个模式的意图。通过在多个对象见共享对象状态的通用部分而不是让各个对象独自持有的方式来节约内存。我们在系统中常会定义一些常量供不通的对象使用，这也体现了享元模式的思想。在Java的核心类库中，像Integer、Boolean、Long和BigDecimal等都缓存了常用的（最大/小／0等）数值。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>翻译的文章对模式的解释比较浅显简单，可以让我们对模式有一个初步的认知，想要更深入理解和体会设计模式一方面离不开平时做项目时对业务和代码关于模式思考，尝试在编码时采用一些合适的模式，将理论运用到实践中，直观上体验模式带来的好处和问题；另一方面还是要深入读下<a target="_blank" rel="noopener" href="https://www.amazon.cn/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%9B%E4%B9%A6-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8F%AF%E5%A4%8D%E7%94%A8%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%BD%AF%E4%BB%B6%E7%9A%84%E5%9F%BA%E7%A1%80-Erich-Gamma/dp/B001130JN8/ref=sr_1_1?ie=UTF8&amp;qid=1509622266&amp;sr=8-1&amp;keywords=%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">《设计模式》</a>这本书，来加深对模式的理解。个人认为模式的具体实现结构不必拘泥文中说的某种实现形式，它更重要的是要解决什么问题，以及我们可能会碰到什么问题，和优雅解决或者避免这些问题的方法。具体怎样去应用一个模式在单一介绍模式的文章中都有给出。</p>
 <p>本次小结的这几种设计模式属设计模式中的结构部分，它告诉我们怎样比较合理的抽象数据结构间的层次和关系，也讲明了采用给出解决方法的会带来的一些问题。当然，一些场景的处理可能会有几种模式都可以适用，这时候就需要根据自己的主要意图、复杂性等方面来考量了，毕竟，复杂的代码让人讨厌。</p>
 <p><strong>TODO</strong> 目前对结构模式还是入门理解，会在看完《设计模式》中对结构模式的讲解后再来更新自己的这篇博文（2017年11月3日）。</p>
 

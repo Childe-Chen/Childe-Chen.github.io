@@ -384,8 +384,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前有转载过一篇关于<a href="https://blog.csdn.net/myjcxd/article/details/52994565">分布式事务最终一致的MQ实现</a>的文章，当时也是碰到了分布式事务的情形，最后按照文章的思路利用rmq实现了数据的最终一致。不太清楚分布式事务的，可以先看下这边文章了解下。</p>
-<p>PS：本篇默认你已经了解rmq的一些基础并看过部分源代码，建议在看该篇时，先看下官方的文档<a href="https://github.com/apache/rocketmq/blob/master/docs/cn/design.md#5-%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF">RocketMQ事务消息</a>。</p>
+          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前有转载过一篇关于<a target="_blank" rel="noopener" href="https://blog.csdn.net/myjcxd/article/details/52994565">分布式事务最终一致的MQ实现</a>的文章，当时也是碰到了分布式事务的情形，最后按照文章的思路利用rmq实现了数据的最终一致。不太清楚分布式事务的，可以先看下这边文章了解下。</p>
+<p>PS：本篇默认你已经了解rmq的一些基础并看过部分源代码，建议在看该篇时，先看下官方的文档<a target="_blank" rel="noopener" href="https://github.com/apache/rocketmq/blob/master/docs/cn/design.md#5-%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF">RocketMQ事务消息</a>。</p>
 <p>牵涉到的分布式的话题一般都会提到CAP，从知乎上打捞来一份比较好解释。<br>
           <!--noindex-->
             <div class="post-button">
@@ -555,7 +555,7 @@
 
       
           <p>对比看两种消费方式的实现：顺序消费与并发消费。这里对顺序消费只关注消费端，不关心producer与broker怎么处理顺序消息，假设架构及策略已保证消息的全局或者局部顺序性。通过构建假定前提，我们可以忽略本次讨论的非重点内容。以下仍以Push方式为例。</p>
-<h2 id="消费方式"><a href="#消费方式" class="headerlink" title="消费方式"></a>消费方式</h2><p>宏观上看rmq自身是一个生产-消费模式，在他各个角色的具体实现中也不乏生产-消费模式的使用。<code>DefaultMQPushConsumerImpl</code>中消息的拉取及拉取成功后的消费均采用生产-消费的方式进行组织（<code>PullRequest</code>、<code>ConsumeRequest</code>），消费的流程在之前<a href="http://childe.net.cn/2019/01/13/rocketmq-消息重复分析/">rocketmq-消息重复分析</a>一文中记录的很清楚，不再展开。<br>
+<h2 id="消费方式"><a href="#消费方式" class="headerlink" title="消费方式"></a>消费方式</h2><p>宏观上看rmq自身是一个生产-消费模式，在他各个角色的具体实现中也不乏生产-消费模式的使用。<code>DefaultMQPushConsumerImpl</code>中消息的拉取及拉取成功后的消费均采用生产-消费的方式进行组织（<code>PullRequest</code>、<code>ConsumeRequest</code>），消费的流程在之前<a target="_blank" rel="noopener" href="http://childe.net.cn/2019/01/13/rocketmq-消息重复分析/">rocketmq-消息重复分析</a>一文中记录的很清楚，不再展开。<br>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/01/23/rocketmq-%E6%B7%B1%E5%85%A5%E6%B6%88%E8%B4%B9%E6%BA%90%E7%A0%81/#more" rel="contents">
@@ -720,7 +720,7 @@
 
       
           <p>一直在用rocketmq，对他的功能和大概流程略知一些，但是比较浮，经不起稍微的推敲。是时候进一步了解下这个NB的中间件了。</p>
-<p>这里不再赘述它的那些特性，网上一大堆，这里主要按照自己想了解的一些方面作整理，贴出部分核心代码，意图通过表现各个角色间的交互，勾画大致架构，方便以后对每个要点各个深入。如果想要引导来阅读源代码，推荐<a href="https://fdx321.github.io/2017/08/16/%E3%80%90RocketMQ%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E3%80%911-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84/">rmq源码系列</a>，写的很有诚意，本笔记中也部分参考引用其文章。</p>
+<p>这里不再赘述它的那些特性，网上一大堆，这里主要按照自己想了解的一些方面作整理，贴出部分核心代码，意图通过表现各个角色间的交互，勾画大致架构，方便以后对每个要点各个深入。如果想要引导来阅读源代码，推荐<a target="_blank" rel="noopener" href="https://fdx321.github.io/2017/08/16/%E3%80%90RocketMQ%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E3%80%911-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84/">rmq源码系列</a>，写的很有诚意，本笔记中也部分参考引用其文章。</p>
 <h2 id="部署结构（逻辑结构-物理结构）"><a href="#部署结构（逻辑结构-物理结构）" class="headerlink" title="部署结构（逻辑结构/物理结构）"></a>部署结构（逻辑结构/物理结构）</h2><p>消息中间件的整体看起来像我们相互邮寄明信片。李雷（Producer）通过邮局公告（Namesrv）找到邮局的地址，然后去邮局（Broker）把明信片（Message）发送给韩梅梅（Consumer）。<br>
           <!--noindex-->
             <div class="post-button">
@@ -803,7 +803,7 @@
 
       
           <p>看开源项目时，时不常遇到一个叫做benchmark的目录，此时脑子停滞，一眼带过，最近一次看到就顺手问了下谷大哥，发现benchmark还是个挺有意思的东西。</p>
-<h3 id="基准测试是什么"><a href="#基准测试是什么" class="headerlink" title="基准测试是什么"></a><a href="https://baike.baidu.com/item/%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95">基准测试是什么</a></h3><p><code>基准测试</code>是指通过设计科学的测试方法、测试工具和测试系统，实现对一类测试对象的某项性能指标进行定量的和可对比的测试。<br>例如，对计算机CPU进行浮点运算、数据访问的带宽和延迟等指标的<code>基准测试</code>，可以使用户清楚地了解每一款CPU的运算性能及作业吞吐能力是否满足应用程序的要求；再如对数据库管理系统的ACID（Atomicity, Consistency, Isolation, Durability, 原子性、一致性、独立性和持久性）、查询时间和联机事务处理能力等方面的性能指标进行<code>基准测试</code>，也有助于使用者挑选最符合自己需求的数据库系统。<br>
+<h3 id="基准测试是什么"><a href="#基准测试是什么" class="headerlink" title="基准测试是什么"></a><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95">基准测试是什么</a></h3><p><code>基准测试</code>是指通过设计科学的测试方法、测试工具和测试系统，实现对一类测试对象的某项性能指标进行定量的和可对比的测试。<br>例如，对计算机CPU进行浮点运算、数据访问的带宽和延迟等指标的<code>基准测试</code>，可以使用户清楚地了解每一款CPU的运算性能及作业吞吐能力是否满足应用程序的要求；再如对数据库管理系统的ACID（Atomicity, Consistency, Isolation, Durability, 原子性、一致性、独立性和持久性）、查询时间和联机事务处理能力等方面的性能指标进行<code>基准测试</code>，也有助于使用者挑选最符合自己需求的数据库系统。<br>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2018/10/23/%E7%AC%94%E8%AE%B0-JMH-Java-Microbenchmark-Harness/#more" rel="contents">
