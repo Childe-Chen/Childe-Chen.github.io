@@ -227,8 +227,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前有转载过一篇关于<a target="_blank" rel="noopener" href="https://blog.csdn.net/myjcxd/article/details/52994565">分布式事务最终一致的MQ实现</a>的文章，当时也是碰到了分布式事务的情形，最后按照文章的思路利用rmq实现了数据的最终一致。不太清楚分布式事务的，可以先看下这边文章了解下。</p>
-<p>PS：本篇默认你已经了解rmq的一些基础并看过部分源代码，建议在看该篇时，先看下官方的文档<a target="_blank" rel="noopener" href="https://github.com/apache/rocketmq/blob/master/docs/cn/design.md#5-%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF">RocketMQ事务消息</a>。</p>
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前有转载过一篇关于<a href="https://blog.csdn.net/myjcxd/article/details/52994565">分布式事务最终一致的MQ实现</a>的文章，当时也是碰到了分布式事务的情形，最后按照文章的思路利用rmq实现了数据的最终一致。不太清楚分布式事务的，可以先看下这边文章了解下。</p>
+<p>PS：本篇默认你已经了解rmq的一些基础并看过部分源代码，建议在看该篇时，先看下官方的文档<a href="https://github.com/apache/rocketmq/blob/master/docs/cn/design.md#5-%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF">RocketMQ事务消息</a>。</p>
 <p>牵涉到的分布式的话题一般都会提到CAP，从知乎上打捞来一份比较好解释。<br><span id="more"></span></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">P 意指分区容忍性。 所谓分区指的是网络分区的意思。详细一点解释，比如你有A B两台服务器，它们之间是有通信的，突然，不知道为什么，它们之间的网络链接断掉了。</span><br><span class="line">好了，那么现在本来AB在同一个网络现在发生了网络分区，变成了A所在的A网络和B所在的B网络。所谓的分区容忍性，就是说一个数据服务的多台服务器在发生了上述情况的时候，</span><br><span class="line">依然能继续提供服务。所以显而易见的，P是大前提，如果P发生了，咱们的数据服务直接不服务了，还谈个毛的可用性和一致性呢。因此CAP要解释成，当P发生的时候，A和C只能而选一。</span><br><span class="line">举个简单的例子，A服务器B服务器同步数据，现在A B之间网络断掉了，那么现在发来A一个写入请求，但是B却没有相关的请求，显然，如果A不写，保持一致性，那么我们就失去了A的服务，</span><br><span class="line">但是如果A写了，跟B的数据就不一致了，我们自然就丧失了一致性。这里设计就涉及到架构师的选择了。注意这里的一致性是强一致性，意思是AB的数据时刻都是同步的，</span><br><span class="line">如果我们放弃了强一致性，不代表我们的数据就是一定是不一致的了，我们可以让A先写入本地，等到通信恢复了再同步给B，这就是所谓的最终一致性，长远的看我们的数据还是一致的，</span><br><span class="line">我们只是在某一个时间窗口里数据不一致罢了。如果这个时间窗口小过了用户逻辑处理的时间。那么其实对于用户来说根本毛都感觉不到。</span><br><span class="line">最终一致性有个很有意思的协议叫gossip就跟传八卦一个意思，我就把我收到里信息里我本地没有的部分加到我本地，再把这个信息发出去，那么长远的看，网络时好时坏，</span><br><span class="line">但是最终所有人都会有所有的信息。因此我们还是能够保证数据的最终一致性的。综上，CAP应该描述成，当发生网络分区的时候，如果我们要继续服务，那么强一致性和可用性只能2选1。</span><br></pre></td></tr></table></figure>
 <h3 id="事务消息之前的实现"><a href="#事务消息之前的实现" class="headerlink" title="事务消息之前的实现"></a>事务消息之前的实现</h3><p>rmq不提供事务消息之前，通过“本地事务存根+rmq消息语义”来实现事务的最终一致性。</p>
@@ -269,7 +269,7 @@
 </ol>
 <p>小生不才，以上如有描述有误的地方还望各位不吝赐教 !^_^！</p>
 <p>源代码版本：release-4.5.0 贴出的源代码会有所删减</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/64778723/answer/224266038">CAP</a><br><a target="_blank" rel="noopener" href="https://github.com/seata/seata">seata</a><br><a target="_blank" rel="noopener" href="https://github.com/apache/rocketmq/blob/master/docs/cn/RocketMQ_Example.md#6-消息事务样例">消息事务样例</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://www.zhihu.com/question/64778723/answer/224266038">CAP</a><br><a href="https://github.com/seata/seata">seata</a><br><a href="https://github.com/apache/rocketmq/blob/master/docs/cn/RocketMQ_Example.md#6-消息事务样例">消息事务样例</a></p>
 
     </div>
 

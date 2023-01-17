@@ -217,7 +217,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>之前简单看过<a target="_blank" rel="noopener" href="http://childe.net.cn/2017/03/07/Dubbo%E6%BA%90%E7%A0%81-SPI%E5%AE%9E%E7%8E%B0%E4%B9%8BExtensionLoader/">Dubbo基于SPI的“微核+插件”形式的架构模式</a>，Dubbo因为这种架构模式使得扩展十分简单，另外Dubbo的<a target="_blank" rel="noopener" href="http://dubbo.apache.org/books/dubbo-dev-book/design.html">框架分层</a>十分清晰，看起源码来相对轻松不少。</p>
+          <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>之前简单看过<a href="http://childe.net.cn/2017/03/07/Dubbo%E6%BA%90%E7%A0%81-SPI%E5%AE%9E%E7%8E%B0%E4%B9%8BExtensionLoader/">Dubbo基于SPI的“微核+插件”形式的架构模式</a>，Dubbo因为这种架构模式使得扩展十分简单，另外Dubbo的<a href="http://dubbo.apache.org/books/dubbo-dev-book/design.html">框架分层</a>十分清晰，看起源码来相对轻松不少。</p>
 <p>在使用Dubbo时突然想到几个问题，Dubbo默认使用tcp长链接，消费者们可能同时发起调用，提供者是怎样处理这些请求的？消费者和生产者之间链接如何复用？消费者和提供者之间几个长链接？要搞清楚这几个问题要从Dubbo的exchange和transport层来找答案。<br>
           <!--noindex-->
             <div class="post-button">
@@ -638,7 +638,7 @@
 
       
           <h3 id="意图"><a href="#意图" class="headerlink" title="意图"></a>意图</h3><p>State是行为模式的一种，它允许你在对象内部状态发生变化时改变其行为。这个对象会改变它的类。</p>
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>状态模式和<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Finite-state_machine">有限状态机</a>很相似。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>状态模式和<a href="https://en.wikipedia.org/wiki/Finite-state_machine">有限状态机</a>很相似。</p>
 <p>它主要的思想是程序是几个状态之一，这些状态相互关联。状态的数量和它们之间的转换是有限的并且是预先定义的。根据当前的状态，程序对相同的事件会有不同的响应。</p>
 <p>类似的方法可以应用到对象上。比如，Document（提案）对象可以是以下三种状态之一：Draft（草案），Moderations（待审）和Publish（发布）。对每种状态而言，publish方法会有不同的处理方式：</p>
           <!--noindex-->

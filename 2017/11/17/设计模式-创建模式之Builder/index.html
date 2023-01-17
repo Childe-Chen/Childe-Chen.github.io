@@ -228,7 +228,7 @@
         <h3 id="意图"><a href="#意图" class="headerlink" title="意图"></a>意图</h3><p>Builder是创建模式的一种，让你可以使用相同的构建过程生成不同类型和对象的表示形式。BUilder允许一步一步构建复杂对象。</p>
 <h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>假设有一个复杂对象需要一步一步的初始化许多字段和嵌套对象。这些代码通常放在一个有很多参数的构造方法中，或者更糟糕，分散在客户端代码中。</p>
 <p>比如，让我们考虑下如何创建一个House对象。创建一个简单的房子，你需要盖四面墙，安装一个门和两个窗户，构建房顶。但是，如果你想要一个更大，更亮堂，并且有后院和其他好吃的东西的房子呢？<br><span id="more"></span><br>想到的最简单的解决方式是从Hose类扩展，通过创建子类来覆盖所有参数的组合。这种处理方式明显会导致创建许多子类。任何新的参数，比如阳台风格，都需要扩张这个层级甚至扩张很多。</p>
-<p>这些参数大多时候是无用的，导致<a target="_blank" rel="noopener" href="https://refactoring.guru/smells/long-parameter-list">构造方法看起来很丑陋</a>。比如，很多房子没有游泳池。因此，和游泳池相关的所有参数99%情况下都是无用的。</p>
+<p>这些参数大多时候是无用的，导致<a href="https://refactoring.guru/smells/long-parameter-list">构造方法看起来很丑陋</a>。比如，很多房子没有游泳池。因此，和游泳池相关的所有参数99%情况下都是无用的。</p>
 <h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>Builder模式建议抽离出类自身的构造代码到不同的对象中，这种对象叫做builder。</p>
 <p>模式把对象的构造组织称一系列步骤（比如：buildWalls，BuildDoor等）。创建这个对象，你需要调用一个构造类中的几个构造步骤。最重要的一点是你不需要调用所有的步骤。你只能使用生成对象的特定配置所需的步骤。</p>
 <p>通常，对于你正在尝试构建的各种产品，相同的构建步骤将会有所不同（一样步骤，但是每个步骤完成的方式不同）。比如，一个机舱可以用木日志建造，但是一座城堡必须用石头。</p>
@@ -316,7 +316,7 @@ java.nio.ByteBuffer#put() (also in CharBuffer, ShortBuffer, IntBuffer,  LongBuff
 
 所有java.lang.Appendable接口的实现
 </code></pre><p>鉴定：Builder模式可以在类中识别，它有一个创建方法和几个方法来配置结果对象。Builder方法通常是支持链式调用（比如，someBuilder-&gt;setValueA(1)-&gt;setValueB(2)-&gt;create()）。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a target="_blank" rel="noopener" href="https://refactoring.guru/design-patterns/builder">https://refactoring.guru/design-patterns/builder</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>翻译整理自：<a href="https://refactoring.guru/design-patterns/builder">https://refactoring.guru/design-patterns/builder</a></p>
 
     </div>
 

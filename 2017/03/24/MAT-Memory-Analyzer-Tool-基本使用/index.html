@@ -275,7 +275,7 @@
 <p>通常在排查内存泄漏的时候，我们会选择<code>exclude all phantom/weak/soft etc.references</code>，意思是：查看排除虚引用/弱引用/软引用等的引用链。因为这些引用的对象可以直接被GC给回收，我们要看的就是某个对象否还存在Strong引用链（在导出HeapDump之前要手动出发GC来保证），如果有，则说明可能存在内存泄漏，然后再去排查具体引用。</p>
 <p><img src="https://res.cloudinary.com/childe/image/upload/v1535288886/blog/mat/GCRoot.jpg" alt="GCRoot.png"></p>
 <p>查看的时候要和左边框中的一些信息结合起来，他提供了更加详细的介绍。</p>
-<p><a target="_blank" rel="noopener" href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html">GC Root 定义如下（官网摘录）：</a><br>A garbage collection root is an object that is accessible from outside the heap. The following reasons make an object a GC root:</p>
+<p><a href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html">GC Root 定义如下（官网摘录）：</a><br>A garbage collection root is an object that is accessible from outside the heap. The following reasons make an object a GC root:</p>
 <ul>
 <li><p>System Class<br>Class loaded by bootstrap/system class loader. For example, everything from the rt.jar like java.util.* .</p>
 </li>
@@ -322,8 +322,8 @@
 <p><img src="https://res.cloudinary.com/childe/image/upload/v1535288886/blog/mat/export.png" alt="export.png"></p>
 <h4 id="Object-Query-Language"><a href="#Object-Query-Language" class="headerlink" title="Object Query Language"></a>Object Query Language</h4><p><em>TODO</em> 单独一篇来讲</p>
 <p>小生不才，以上如有描述有误的地方还望各位不吝赐教 !^_^！</p>
-<p>参考整理自<a target="_blank" rel="noopener" href="http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/">http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/</a></p>
-<p><a target="_blank" rel="noopener" href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html">MAT官方文档</a></p>
+<p>参考整理自<a href="http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/">http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/</a></p>
+<p><a href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html">MAT官方文档</a></p>
 
     </div>
 
