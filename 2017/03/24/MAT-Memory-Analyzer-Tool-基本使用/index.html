@@ -227,7 +227,7 @@
       
         <h3 id="MAT-Memory-Analyzer-Tool-基本使用"><a href="#MAT-Memory-Analyzer-Tool-基本使用" class="headerlink" title="MAT Memory Analyzer Tool 基本使用"></a>MAT Memory Analyzer Tool 基本使用</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>分析和理解我们应用中内存的分布是一件极具挑战的事情。一个逻辑错误就有可能导致OutOfMemory。dump内存的方式很单：<code>jmap -dump:format=b,file=path pid</code><br>注意操作时要有正确的用户权限。本篇旨在介绍分析中涉及到的一些概念和操作方法，实际案例分析放在下篇介绍。</p>
 <p><strong>内存泄漏</strong>指由于疏忽或错误造成程序未能释放已经不再使用的内存。内存泄漏并非指内存在物理上的消失，而是应用程序分配某段内存后，由于设计错误，导致在释放该段内存之前就失去了对该段内存的控制，从而造成了内存的浪费。</p>
-<h4 id="Histogram"><a href="#Histogram" class="headerlink" title="Histogram"></a>Histogram</h4><a id="more"></a>
+<h4 id="Histogram"><a href="#Histogram" class="headerlink" title="Histogram"></a>Histogram</h4><span id="more"></span>
 <p>当我们用MAT工具(用的eclipse插件)打开dump文件，MAT首先给我们一个应用占用内存的预览。</p>
 <p><img src="https://res.cloudinary.com/childe/image/upload/v1535288887/blog/mat/overview-web.png" alt="overview"></p>
 <p>中间的饼图像我们直观展示了retained size最大的对象。这意味着如果可以处理好<code>com.cxd.jvm.mat.Controller$1 @ 0x7ffa741c8 allocator1</code>  这个对象，我们可以腾出6.6M的内存，它占用了应用总内存的90%以上。进一步查看这个对象的一些信息我们可以使用Histogram。</p>
@@ -237,7 +237,7 @@
 <p>直方图还可以使用正则表达式过滤，例如我们只关心自己包下的类：<code>.*com.cxd.jvm.*</code></p>
 <p><img src="https://res.cloudinary.com/childe/image/upload/v1535288885/blog/mat/filterHistogram.jpg" alt="直方图过滤"></p>
 <p>过滤后，清楚的看到有超过15W的Listener实例存活在应用中。同时我们看到了每个对象对内存的使用情况。有两个维度的计算，Shallow Heap 和 Retained Heap。Shallow Heap是一个对象持有引用占用的内存，并不包含其引用对象所占用的内存，可以理解成对象本身的大小，Shallow Heap对实际分析没有多大用处。常规对象（非数组）的Shallow Size由其成员变量的数量和类型决定。数组的Shallow Size由数组元素的类型（对象类型、基本类型）和数组长度决定。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//"Shallow size" of this obj == 24 Bytes</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">String</span> </span>&#123;<span class="comment">//8 Bytes header </span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">char</span> value[]; <span class="comment">//4 Bytes </span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">int</span> offset; <span class="comment">//4 Bytes </span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">int</span> count; <span class="comment">//4 Bytes </span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">int</span> hash = <span class="number">0</span>; <span class="comment">//4 Bytes</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//&quot;Shallow size&quot; of this obj == 24 Bytes</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">String</span> &#123;<span class="comment">//8 Bytes header </span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">char</span> value[]; <span class="comment">//4 Bytes </span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> offset; <span class="comment">//4 Bytes </span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> count; <span class="comment">//4 Bytes </span></span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> <span class="variable">hash</span> <span class="operator">=</span> <span class="number">0</span>; <span class="comment">//4 Bytes</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="Retained-Heap"><a href="#Retained-Heap" class="headerlink" title="Retained Heap"></a>Retained Heap</h4><p>Retained Heap是一个对象被GC回收时，能够释放其所有引用的Shallow Heap的总和。比如：一个ArrayList持有100,000个元素并且所有元素仅被这个ArrayList持有，每个元素16bytes，那么当该ArrayList被GC后将会释放16 x 100,000 + X，X是ArrayList的Shallow Heap。<br>Retained Heap是Retained Set中所有对象大小的总和，一个对象的Retained Set是当该对象被GC后所要释放对象的集合。</p>
 <p><img src="https://res.cloudinary.com/childe/image/upload/v1535288888/blog/mat/RetainedSet.png" alt="RetainedSet.png"></p>
 <p>Retained Heap有两种计算方式，一种是quick approximation（快速近似），一种是precise retained size（精确计算）。</p>
@@ -260,7 +260,7 @@
 <p>通常在排查内存泄漏的时候，我们会选择<code>exclude all phantom/weak/soft etc.references</code>，意思是：查看排除虚引用/弱引用/软引用等的引用链。因为这些引用的对象可以直接被GC给回收，我们要看的就是某个对象否还存在Strong引用链（在导出HeapDump之前要手动出发GC来保证），如果有，则说明可能存在内存泄漏，然后再去排查具体引用。</p>
 <p><img src="https://res.cloudinary.com/childe/image/upload/v1535288886/blog/mat/GCRoot.jpg" alt="GCRoot.png"></p>
 <p>查看的时候要和左边框中的一些信息结合起来，他提供了更加详细的介绍。</p>
-<p><a href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html" target="_blank" rel="external">GC Root 定义如下（官网摘录）：</a><br>A garbage collection root is an object that is accessible from outside the heap. The following reasons make an object a GC root:</p>
+<p><a target="_blank" rel="noopener" href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html">GC Root 定义如下（官网摘录）：</a><br>A garbage collection root is an object that is accessible from outside the heap. The following reasons make an object a GC root:</p>
 <ul>
 <li><p>System Class<br>Class loaded by bootstrap/system class loader. For example, everything from the rt.jar like java.util.* .</p>
 </li>
@@ -307,8 +307,8 @@
 <p><img src="https://res.cloudinary.com/childe/image/upload/v1535288886/blog/mat/export.png" alt="export.png"></p>
 <h4 id="Object-Query-Language"><a href="#Object-Query-Language" class="headerlink" title="Object Query Language"></a>Object Query Language</h4><p><em>TODO</em> 单独一篇来讲</p>
 <p>小生不才，以上如有描述有误的地方还望各位不吝赐教 !^_^！</p>
-<p>参考整理自<a href="http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/" target="_blank" rel="external">http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/</a></p>
-<p><a href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html" target="_blank" rel="external">MAT官方文档</a></p>
+<p>参考整理自<a target="_blank" rel="noopener" href="http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/">http://eclipsesource.com/blogs/2013/01/21/10-tips-for-using-the-eclipse-memory-analyzer/</a></p>
+<p><a target="_blank" rel="noopener" href="http://help.eclipse.org/kepler/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fshallowretainedheap.html">MAT官方文档</a></p>
 
     </div>
 
